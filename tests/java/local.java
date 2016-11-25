@@ -11,7 +11,6 @@ import org.greenrobot.eventbus.EventBus;
 import java.lang.String;
 import java.util.Locale;
 
-
 public class Test {
 
 }

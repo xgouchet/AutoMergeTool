@@ -24,7 +24,6 @@ import java.lang.Integer;
 >>>>>>> REMOTE
 import java.util.Locale;
 
-
 public class Test {
 
 }

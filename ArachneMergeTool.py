@@ -109,13 +109,14 @@ def merge(config, args):
     tools = config.get(SECT_AMT, 'tools').split(';')
     result = 42
     for tool in tools:
+        print("Trying merge with {0}".format(tool))
         # TODO handle the trustExitCode option
         trust_exit_code = True
         cmd = get_tool_cmd(tool, config)
         cmd = expand_arguments(cmd, args)
-        print ("$ {0}".format(cmd))
+        #print ("$ {0}".format(cmd))
         result = subprocess.call(cmd.split(), shell=False)
-        print ("Result == " + str(result))
+        #print ("Result == " + str(result))
         if trust_exit_code :
             if (result == 0):
                 print("{0} merged successfully".format(tool))

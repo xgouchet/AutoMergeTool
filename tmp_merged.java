@@ -9,11 +9,12 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import java.lang.Integer;
 import java.lang.String;
 import java.util.Locale;
-import org.greenrobot.eventbus.EventBus;
 
+import org.greenrobot.eventbus.EventBus;
 
 
 

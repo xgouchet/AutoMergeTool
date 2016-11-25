@@ -62,7 +62,7 @@ Please send us Pull Request or open Issues to let us know what tool you want us 
 
 ArachneMergeTool comes bundled with a few automated tools that you can use to handle some known and tedious conflicts easily.
 
- - **MergeJavaImports** : this will handle any conflict within the imports section of your java files
+ - **MergeJavaImports** : this will handle any conflict within the imports section of your java files.
 
 ## Caveats
 
@@ -72,6 +72,7 @@ For now, the config file for ArachneMergeTool doesn't support leading whitespace
 
  - Right now, AMT is written for Python 2.7. A 3.0 compatible version should be written soon
  - For now only meld is recognized as a known merging tool. Others could be included from [Git's mergetools code](https://github.com/git/git/tree/master/mergetools).
+ - Allow different configurations based on file type (eg : `tools.java = foo`)
 
 ## Contribute
 

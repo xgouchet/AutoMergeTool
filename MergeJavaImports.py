@@ -2,7 +2,7 @@ import argparse
 import sys
 import re
 
-IMPORT_REGEX = re.compile('^\s*(static\s+)?import.*$')
+IMPORT_REGEX = re.compile('^\s*import\s+(static\s+)?(.*)\s*;\s*$')
 PACKAGE_REGEX = re.compile('^\s*package\s+[\w][\w\.]+[\w].*$')
 EMPTY_REGEX = re.compile('^[\s\n]*$')
 
@@ -60,6 +60,17 @@ def get_merge_imports(args):
     return sorted(imports_merged)
 
 
+def write_merged_imports(f, imports):
+    previous_tld = ''
+    for imp in imports :
+        name = re.search(IMPORT_REGEX, imp)
+        tld = name.group(2).split('.', 1)[0]
+        if not(tld == previous_tld) :
+            f.write("\n")
+            previous_tld = tld
+        f.write(imp)
+
+
 def apply_imports(merged_filename, imports):
 
     conflict = False
@@ -76,8 +87,6 @@ def apply_imports(merged_filename, imports):
                 if line.startswith(CONFLICT_END):
                     conflict = False
                     if keep_conflict:
-                        print ("kept conflict")
-                        print (conflict_content)
                         complete = False
                         f.write(conflict_content)
                 elif line.startswith(CONFLICT_SEP) or line.startswith(CONFLICT_BASE):
@@ -92,9 +101,7 @@ def apply_imports(merged_filename, imports):
                 continue
             elif re.match(PACKAGE_REGEX, line):
                 f.write(line)
-                f.write("\n")
-                for imp in imports :
-                    f.write(imp)
+                write_merged_imports(f, imports)
             elif line.startswith(CONFLICT_START):
                 conflict = True
                 keep_conflict = False
@@ -104,8 +111,28 @@ def apply_imports(merged_filename, imports):
     return complete
 
 
+def has_merged_conflicts(merged_filename):
+    conflict = False
+    with open(merged_filename) as f:
+        for line in f:
+            if (conflict):
+                if line.startswith(CONFLICT_END):
+                    conflict = False
+                elif line.startswith(CONFLICT_SEP) or line.startswith(CONFLICT_BASE):
+                    continue
+                elif re.match(IMPORT_REGEX, line):
+                    return True
+            elif line.startswith(CONFLICT_START):
+                conflict = True
+    return False
+
+
 if __name__ == '__main__':
     args = parse_arguments()
+    if not(has_merged_conflicts(args.merged)):
+        print ("No java imports conflicts, ignored")
+        # do nothing, leave as is
+        sys.exit(1)
     merged_imports = get_merge_imports(args)
     if apply_imports(args.merged, merged_imports) :
         sys.exit(0)

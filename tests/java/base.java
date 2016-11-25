@@ -13,7 +13,6 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.Locale;
 
-
 public class Test {
 
 }
