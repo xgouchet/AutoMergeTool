@@ -11,7 +11,14 @@ CONFLICT_BASE  = "|||||||"
 CONFLICT_SEP   = "======="
 CONFLICT_END   = ">>>>>>>"
 
+IMPORT_GROUPS = []
+IMPORT_GROUPS_ECLIPSE = [("import static ", 0),("import java.", 1),("import javax.", 2),("import org.", 3),("import com.", 4),("import ", 5)]
+IMPORT_GROUPS_ANDROID = [("import android.", 0),("import com.", 1),("import junit.", 2),("import net.", 3),("import org.", 4),("import java.", 5),("import javax.", 6),("import ", 7),("import static ", 8)]
+IMPORT_GROUPS_IJ_IDEA = [("import ", 0),("import javax.", 1),("import java.", 2),("import static ", 3)]
 
+ORDER_ECLIPSE = "eclipse"
+ORDER_IJ_IDEA = "idea"
+ORDER_ANDROID = "android"
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="A tool to combine multiple merge tools")
@@ -20,6 +27,8 @@ def parse_arguments():
     parser.add_argument('-l', '--local', required=True)
     parser.add_argument('-r', '--remote', required=True)
     parser.add_argument('-m', '--merged', required=True)
+    parser.add_argument('-o', '--order', choices=[ORDER_ECLIPSE, ORDER_IJ_IDEA, ORDER_ANDROID], required=False)
+    parser.add_argument('-c', '--customorder', required=False)
 
     return parser.parse_args()
 
@@ -57,17 +66,33 @@ def get_merge_imports(args):
         if ((imp not in imports_merged) and (imp not in imports_base)):
             imports_merged.append(imp)
 
-    return sorted(imports_merged)
+    return sorted(sorted(imports_merged), key=lambda imp: get_import_group(imp))
+
+
+def set_import_groups(args):
+    global IMPORT_GROUPS
+    if (args.order != None):
+        if (args.order == ORDER_ANDROID):
+            IMPORT_GROUPS = sorted(IMPORT_GROUPS_ANDROID, key=lambda grp: len(grp[0]), reverse=True)
+        elif (args.order == ORDER_IJ_IDEA):
+            IMPORT_GROUPS = sorted(IMPORT_GROUPS_IJ_IDEA, key=lambda grp: len(grp[0]), reverse=True)
+        elif (args.order == ORDER_ECLIPSE):
+            IMPORT_GROUPS = sorted(IMPORT_GROUPS_ECLIPSE, key=lambda grp: len(grp[0]), reverse=True)
+
+def get_import_group(imp):
+    for group in IMPORT_GROUPS:
+        if (imp.startswith(group[0])):
+            return group[1]
+    return len(IMPORT_GROUPS)
 
 
 def write_merged_imports(f, imports):
-    previous_tld = ''
+    previous_group = -1
     for imp in imports :
-        name = re.search(IMPORT_REGEX, imp)
-        tld = name.group(2).split('.', 1)[0]
-        if not(tld == previous_tld) :
+        group = get_import_group(imp)
+        if not(group == previous_group) :
             f.write("\n")
-            previous_tld = tld
+            previous_group = group
         f.write(imp)
 
 
@@ -132,6 +157,8 @@ if __name__ == '__main__':
     if not(has_merged_conflicts(args.merged)):
         print ("No java imports conflicts, ignored")
         sys.exit(1)
+    set_import_groups(args)
+    print(IMPORT_GROUPS)
     merged_imports = get_merge_imports(args)
     if apply_imports(args.merged, merged_imports) :
         sys.exit(0)

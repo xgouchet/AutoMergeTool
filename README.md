@@ -62,7 +62,10 @@ Please send us Pull Request or open Issues to let us know what tool you want us 
 
 ArachneMergeTool comes bundled with a few automated tools that you can use to handle some known and tedious conflicts easily.
 
- - **MergeJavaImports** : this will handle any conflict within the imports section of your java files.
+ - **MergeJavaImports** : this will handle any conflict within the imports section of your java files. You can specify an additional order parameter as follow, to specify the way to order imports (presets include AndroidStudio, IntelliJ Idea and Eclipse defaults) :
+
+    [mergetool "mji"]
+    order=android
 
 ## Caveats
 

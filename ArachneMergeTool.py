@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import argparse
 import inspect
 import os
@@ -24,8 +27,8 @@ KNOWN_PATHS = {
     'mji' : CURRENT_DIR + '/MergeJavaImports.py'
 }
 KNOWN_CMDS = {
-    'meld' : '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
-    'mji' : 'python {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED'
+    'meld' : '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE" ',
+    'mji' : 'python {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED '
 }
 KNOWN_TRUSTS = {
     'meld' : False,
@@ -88,7 +91,15 @@ def get_tool_cmd(tool, config):
     path = get_tool_path(tool, config)
 
     if tool in KNOWN_CMDS:
-        return KNOWN_CMDS[tool].format(path)
+        cmd = KNOWN_CMDS[tool].format(path)
+        for option in config.options(section):
+            if (option == OPT_CMD):
+                pass
+            if (option == OPT_PATH):
+                pass
+            # print (option)
+            cmd += "--{0} {1}".format(option, config.get(section, option))
+        return cmd
 
     # No Default
     print("Unknown tool {0}".format(tool))
@@ -104,12 +115,12 @@ def expand_arguments(cmd, args):
 
 
 def merge(config, args):
-    if (not(config.has_option(SECT_AMT, 'tools'))):
-        raise RuntimeError('Missing the {0}.{1} configuration'.format(SECT_AMT, 'tools'))
-    tools = config.get(SECT_AMT, 'tools').split(';')
+    if (not(config.has_option(SECT_AMT, OPT_TOOLS))):
+        raise RuntimeError('Missing the {0}.{1} configuration'.format(SECT_AMT, OPT_TOOLS))
+    tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
     result = 42
     for tool in tools:
-        print("Trying merge with {0}".format(tool))
+        print(" [AMT] → Trying merge with {0}".format(tool))
         # TODO handle the trustExitCode option
         trust_exit_code = True
         cmd = get_tool_cmd(tool, config)
@@ -119,16 +130,17 @@ def merge(config, args):
         #print ("Result == " + str(result))
         if trust_exit_code :
             if (result == 0):
-                print("{0} merged successfully".format(tool))
+                print(" [AMT] ✓ {0} merged successfully".format(tool))
                 return 0
             else :
-                print("{0} didn't solve all conflicts".format(tool))
+                print(" [AMT] ✗ {0} didn't solve all conflicts".format(tool))
         else :
             # TODO analyse the merged file and look for conflicts
             return 0
     return result
 
 if __name__ == '__main__':
+    print("Arachne kickin' in !")
     args = parse_arguments()
     config = read_config(os.path.expanduser(args.config))
     result = merge(config, args)
