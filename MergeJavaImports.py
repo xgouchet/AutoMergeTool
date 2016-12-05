@@ -49,12 +49,12 @@ def get_merge_imports(args):
 
     # add imports from local
     for imp in imports_local:
-        if (imp not in imports_merged):
+        if ((imp not in imports_merged) and (imp not in imports_base)):
             imports_merged.append(imp)
 
     # add imports from remote
     for imp in imports_remote:
-        if (imp not in imports_merged):
+        if ((imp not in imports_merged) and (imp not in imports_base)):
             imports_merged.append(imp)
 
     return sorted(imports_merged)
@@ -131,7 +131,6 @@ if __name__ == '__main__':
     args = parse_arguments()
     if not(has_merged_conflicts(args.merged)):
         print ("No java imports conflicts, ignored")
-        # do nothing, leave as is
         sys.exit(1)
     merged_imports = get_merge_imports(args)
     if apply_imports(args.merged, merged_imports) :
