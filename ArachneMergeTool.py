@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import argparse
@@ -6,7 +6,7 @@ import inspect
 import os
 import subprocess
 import sys
-import ConfigParser
+import configparser
 
 # CONSTANTS
 DEFAULT_CONFIG = '~/.amtconfig'
@@ -20,23 +20,23 @@ OPT_CMD = 'cmd'
 OPT_TRUST_EXIT_CODE = 'trustExitCode'
 
 CURRENT_FRAME = inspect.getfile(inspect.currentframe())
-CURRENT_DIR =  os.path.dirname(os.path.abspath(CURRENT_FRAME))
+CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
 
 # TODO based on git's internal mergetool code, create defaults for known tools
-KNOWN_PATHS = {
-    'mji' : CURRENT_DIR + '/MergeJavaImports.py'
-}
+KNOWN_PATHS = {'mji': CURRENT_DIR + '/MergeJavaImports.py'}
 KNOWN_CMDS = {
-    'meld' : '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE" ',
-    'mji' : 'python {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED '
+    'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE" ',
+    'mji': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED '
 }
 KNOWN_TRUSTS = {
-    'meld' : False,
-    'mji' : True,
+    'meld': False,
+    'mji': True,
 }
 
+
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="A tool to combine multiple merge tools")
+    parser = argparse.ArgumentParser(
+        description="A tool to combine multiple merge tools")
 
     parser.add_argument('-b', '--base', required=True)
     parser.add_argument('-l', '--local', required=True)
@@ -48,7 +48,7 @@ def parse_arguments():
 
 
 def read_config(config_path):
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read(config_path)
     return config
 
@@ -115,8 +115,9 @@ def expand_arguments(cmd, args):
 
 
 def merge(config, args):
-    if (not(config.has_option(SECT_AMT, OPT_TOOLS))):
-        raise RuntimeError('Missing the {0}.{1} configuration'.format(SECT_AMT, OPT_TOOLS))
+    if (not (config.has_option(SECT_AMT, OPT_TOOLS))):
+        raise RuntimeError('Missing the {0}.{1} configuration'.format(
+            SECT_AMT, OPT_TOOLS))
     tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
     result = 42
     for tool in tools:
@@ -128,19 +129,20 @@ def merge(config, args):
         #print ("$ {0}".format(cmd))
         result = subprocess.call(cmd.split(), shell=False)
         #print ("Result == " + str(result))
-        if trust_exit_code :
+        if trust_exit_code:
             if (result == 0):
                 print(" [AMT] ✓ {0} merged successfully".format(tool))
                 return 0
-            else :
+            else:
                 print(" [AMT] ✗ {0} didn't solve all conflicts".format(tool))
-        else :
+        else:
             # TODO analyse the merged file and look for conflicts
             return 0
     return result
 
+
 if __name__ == '__main__':
-    print("Arachne kickin' in !")
+    print("ArachneMergeTool kickin' in !")
     args = parse_arguments()
     config = read_config(os.path.expanduser(args.config))
     result = merge(config, args)

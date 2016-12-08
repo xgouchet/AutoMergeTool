@@ -11,14 +11,13 @@ The basic idea is to have simple automatic merging tools that can solve some ted
 
 Clone this repository somewhere on your system (eg: `/opt/ArachneMergeTool` or `/usr/local/ArachneMergeTool` on Linux and Mac)
 
-### Git
 Update your `.gitconfig` file (either global or per repository) :
 
 
     [merge]
     tool = amt
     [mergetool "amt"]
-    cmd = python /path/to/ArachneMergeTool.py -b "$BASE" -l "$LOCAL" -r "$REMOTE" -m "$MERGED"
+    cmd = /path/to/ArachneMergeTool.py -b "$BASE" -l "$LOCAL" -r "$REMOTE" -m "$MERGED"
 
 or just type the following in a shell prompt :
 
@@ -26,11 +25,6 @@ or just type the following in a shell prompt :
     $ git config --global merge.tool amt
     $ git config --global mergetool.extMerge.cmd 'python /path/to/ArachneMergeTool.py -b "$BASE" -l "$LOCAL" -r "$REMOTE" -m "$MERGED"'
 
-### Standalone
-
-Just run the followin, providing the base, local, remote and merged files to the
-
-    $ python /path/to/ArachneMergeTool.py
 
 ## Configuration
 
@@ -48,32 +42,33 @@ The most important configuration is the `tools` option which lists the different
 
 For each tool listed in the `tools` option, you can have a `[mergetool "name"]` section¸ which is compatible with `.gitconfig` syntax, with the following options :
 
- - path : the path to the tool, if it's not already available in PATH
- - cmd : a custom command line invocation. You can use the following variable in the command line : `$BASE`, `$LOCAL`, `$REMOTE` and `$MERGED`
- - trustExitCode : if set to true, this will assume that the exit code reflects the success of the merge. Otherwise, ArachneMergeTool will prompt the user to indicate the success of the resolution after the merge tool has exited.
+ - **path** : the path to the tool, if it's not already available in PATH
+ - **cmd** : a custom command line invocation. You can use the following variable in the command line : `$BASE`, `$LOCAL`, `$REMOTE` and `$MERGED`
+ - **trustExitCode** : if set to true, this will assume that the exit code reflects the success of the merge. Otherwise, ArachneMergeTool will prompt the user to indicate the success of the resolution after the merge tool has exited.
 
 ## Known merge tools
 
- - meld
+ - **meld**
 
 Please send us Pull Request or open Issues to let us know what tool you want us to include
 
-## Internal merge tools
+## Internal automatic merge tools
 
 ArachneMergeTool comes bundled with a few automated tools that you can use to handle some known and tedious conflicts easily.
 
- - **MergeJavaImports** : this will handle any conflict within the imports section of your java files. You can specify an additional order parameter as follow, to specify the way to order imports (presets include AndroidStudio, IntelliJ Idea and Eclipse defaults) :
+#### MergeJavaImports
 
-    [mergetool "mji"]
-    order=android
+This tool will handle any conflict within the imports section of your java files.
+
+You can add the following options :
+ - **mergetool.mji.order** : specify the way to order imports. Presets include Android Studio : `android`; IntelliJ Idea : `idea`; and Eclipse : `eclipse`
 
 ## Caveats
 
-For now, the config file for ArachneMergeTool doesn't support leading whitespaces. Converting to python 3.0 should fix that
+ArachneMergeTool requires Python 3.x
 
 ## Todo
 
- - Right now, AMT is written for Python 2.7. A 3.0 compatible version should be written soon
  - For now only meld is recognized as a known merging tool. Others could be included from [Git's mergetools code](https://github.com/git/git/tree/master/mergetools).
  - Allow different configurations based on file type (eg : `tools.java = foo`)
 
@@ -84,6 +79,7 @@ If you want to contribute, pull requests are welcome, and you can also report is
 ## See Also
 
  - [Git Mergetool documentation](https://git-scm.com/docs/git-mergetool)
+ - [Git Config documentation](https://git-scm.com/docs/git-config)
 
 ## License
 
