@@ -74,7 +74,6 @@ def read_imports(filename):
 def get_merge_imports(base_file, local_file, remote_file):
     """
     Resolve the imports that should appear in the merged file
-
     base_file -- the path to the base file
     local_file -- the path to the local file
     remote_file -- the path to the remote file
@@ -99,16 +98,13 @@ def get_merge_imports(base_file, local_file, remote_file):
     for imp in imports_remote:
         if ((imp not in imports_merged) and (imp not in imports_base)):
             imports_merged.append(imp)
-
-    return sorted(
-        sorted(imports_merged), key=lambda imp: get_import_group(imp))
+    return imports_merged
 
 
 # TODO add the possibility to define ordering customs from a config file
 def set_import_groups(preset=None):
     """
     Sets the prefered ordering for imports
-
     preset -- one of "android", "eclipse", "idea"
     """
     global IMPORT_GROUPS
@@ -121,6 +117,10 @@ def set_import_groups(preset=None):
 
 
 def get_import_group(imp):
+    """
+    Returns the group index the imports belongs to
+    imp -- the import line
+    """
     for group in IMPORT_GROUPS:
         if (imp.startswith(group[0])):
             return group[1]
@@ -128,8 +128,15 @@ def get_import_group(imp):
 
 
 def write_merged_imports(f, imports):
+    """
+    Sorts and write the given imports to the file, adding a blank line between
+    each group
+    f -- the file object (needs write permission)
+    imports -- the list of imports
+    """
+    sorted_imports = sorted(sorted(imports), key=lambda i: get_import_group(i))
     previous_group = -1
-    for imp in imports:
+    for imp in sorted_imports:
         group = get_import_group(imp)
         if not (group == previous_group):
             f.write("\n")
@@ -137,16 +144,22 @@ def write_merged_imports(f, imports):
         f.write(imp)
 
 
-def apply_imports(merged_filename, imports):
-
+def apply_imports(filename, imports):
+    """
+    Rewrite the given file, replacing the imports by the list given in parameters
+    filename -- path to the file to rewrite
+    imports -- the list of imports to use
+    """
     conflict = False
     conflict_content = ""
     keep_conflict = False
     complete = True
 
-    with open(merged_filename) as f:
+    # First read the original content
+    with open(filename) as f:
         content = f.readlines()
-    with open(merged_filename, 'w') as f:
+    # then rewrite the file
+    with open(filename, 'w') as f:
         for line in content:
             if (conflict):
                 conflict_content += line
@@ -179,6 +192,9 @@ def apply_imports(merged_filename, imports):
 
 
 def has_merged_conflicts(merged_filename):
+    """
+    Check if the current file has any conflicts in the imports section
+    """
     conflict = False
     with open(merged_filename) as f:
         for line in f:

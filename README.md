@@ -29,7 +29,7 @@ or just type the following in a shell prompt :
 ## Configuration
 
 You can have a global configuration (in ~/.amtconfig) or provide a custom config file in the command
-line (with the `-c --config` optional argument).
+line (with the `-c/--config` optional argument).
 
     [ArachneMergeTool]
     tools = mytool;meld;kdiff;vimdiff
@@ -63,9 +63,11 @@ This tool will handle any conflict within the imports section of your java files
 You can add the following options :
  - **mergetool.mji.order** : specify the way to order imports. Presets include Android Studio : `android`; IntelliJ Idea : `idea`; and Eclipse : `eclipse`
 
+
+
 ## Caveats
 
-ArachneMergeTool requires Python 3.x
+ArachneMergeTool requires Python 3.x, and won't work with Python 2.x
 
 ## Todo
 

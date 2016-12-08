@@ -35,6 +35,7 @@ KNOWN_TRUSTS = {
 
 
 def parse_arguments():
+    """Parses the arguments passed on invocation in a dict and return it"""
     parser = argparse.ArgumentParser(
         description="A tool to combine multiple merge tools")
 
@@ -48,16 +49,26 @@ def parse_arguments():
 
 
 def read_config(config_path):
+    """Reads the AMT configuration from the given path"""
     config = configparser.RawConfigParser()
     config.read(config_path)
     return config
 
 
 def tool_section_name(tool):
+    """
+    Generates the mergetool section name for the given tool
+    eg : tool_section_name("foo") →
+    """
     return SECT_TOOL_FORMAT.format(tool)
 
 
 def get_tool_trust(tool, config):
+    """
+    Check whether we should trust the exit code of the given tool
+    tool -- the name of the tool
+    config -- the current amt configuration
+    """
     section = tool_section_name(tool)
     if config.has_option(section, OPT_TRUST_EXIT_CODE):
         return config.get(section, OPT_TRUST_EXIT_CODE)
@@ -71,6 +82,11 @@ def get_tool_trust(tool, config):
 
 
 def get_tool_path(tool, config):
+    """
+    Get the path for the given tool
+    tool -- the name of the tool
+    config -- the current amt configuration
+    """
     section = tool_section_name(tool)
     if config.has_option(section, OPT_PATH):
         return config.get(section, OPT_PATH)
@@ -84,6 +100,11 @@ def get_tool_path(tool, config):
 
 
 def get_tool_cmd(tool, config):
+    """
+    Get the command line invocation for the givent tool
+    tool -- the name of the tool
+    config -- the current amt configuration
+    """
     section = tool_section_name(tool)
     if (config.has_option(section, OPT_CMD)):
         return config.get(section, OPT_CMD)
@@ -97,7 +118,6 @@ def get_tool_cmd(tool, config):
                 pass
             if (option == OPT_PATH):
                 pass
-            # print (option)
             cmd += "--{0} {1}".format(option, config.get(section, option))
         return cmd
 
@@ -107,6 +127,11 @@ def get_tool_cmd(tool, config):
 
 
 def expand_arguments(cmd, args):
+    """
+    Expands the named arguments in the command line invocation
+    cmd -- the command line invocation
+    args -- the arguments with the base, local, remote and merged filenames
+    """
     cmd = cmd.replace('$BASE', args.base)
     cmd = cmd.replace('$LOCAL', args.local)
     cmd = cmd.replace('$REMOTE', args.remote)
@@ -115,6 +140,11 @@ def expand_arguments(cmd, args):
 
 
 def merge(config, args):
+    """
+    Handle the mergetools chain for the given argument
+    config -- the current amt configuration
+    args -- the arguments with the base, local, remote and merged filenames
+    """
     if (not (config.has_option(SECT_AMT, OPT_TOOLS))):
         raise RuntimeError('Missing the {0}.{1} configuration'.format(
             SECT_AMT, OPT_TOOLS))
@@ -122,13 +152,12 @@ def merge(config, args):
     result = 42
     for tool in tools:
         print(" [AMT] → Trying merge with {0}".format(tool))
-        # TODO handle the trustExitCode option
-        trust_exit_code = True
+        # prepare the command line invocation
         cmd = get_tool_cmd(tool, config)
         cmd = expand_arguments(cmd, args)
-        #print ("$ {0}".format(cmd))
         result = subprocess.call(cmd.split(), shell=False)
-        #print ("Result == " + str(result))
+
+        trust_exit_code = get_tool_trust(tool, config)
         if trust_exit_code:
             if (result == 0):
                 print(" [AMT] ✓ {0} merged successfully".format(tool))
@@ -137,7 +166,8 @@ def merge(config, args):
                 print(" [AMT] ✗ {0} didn't solve all conflicts".format(tool))
         else:
             # TODO analyse the merged file and look for conflicts
-            return 0
+            print(" [AMT] ? {0} returned".format(tool))
+
     return result
 
 
