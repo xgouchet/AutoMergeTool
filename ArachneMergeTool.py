@@ -23,14 +23,20 @@ CURRENT_FRAME = inspect.getfile(inspect.currentframe())
 CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
 
 # TODO based on git's internal mergetool code, create defaults for known tools
-KNOWN_PATHS = {'mji': CURRENT_DIR + '/MergeJavaImports.py'}
+KNOWN_PATHS = {
+    'mji': CURRENT_DIR + '/MergeJavaImports.py',
+    'mwc': CURRENT_DIR + '/MergeWovenConflicts.py'
+}
 KNOWN_CMDS = {
     'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE" ',
-    'mji': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED '
+    'mji': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED ',
+    'mwc': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED '
 }
+
 KNOWN_TRUSTS = {
     'meld': False,
     'mji': True,
+    'mwc': True
 }
 
 
@@ -113,12 +119,15 @@ def get_tool_cmd(tool, config):
 
     if tool in KNOWN_CMDS:
         cmd = KNOWN_CMDS[tool].format(path)
-        for option in config.options(section):
-            if (option == OPT_CMD):
-                pass
-            if (option == OPT_PATH):
-                pass
-            cmd += "--{0} {1}".format(option, config.get(section, option))
+        if (config.has_section(section)):
+            for option in config.options(section):
+                if (option == OPT_CMD):
+                    pass
+                if (option == OPT_PATH):
+                    pass
+                if (option == OPT_TRUST_EXIT_CODE):
+                    pass
+                cmd += "--{0} {1}".format(option, config.get(section, option))
         return cmd
 
     # No Default
@@ -168,6 +177,7 @@ def merge(config, args):
             # TODO analyse the merged file and look for conflicts
             print(" [AMT] ? {0} returned".format(tool))
 
+    print (" [AMT] ⚑ Sorry, it seems we can't solve it this time")
     return result
 
 
@@ -176,5 +186,4 @@ if __name__ == '__main__':
     args = parse_arguments()
     config = read_config(os.path.expanduser(args.config))
     result = merge(config, args)
-    # print("Exit Code : {0}".format(result))
     sys.exit(result)

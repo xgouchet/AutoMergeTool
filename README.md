@@ -16,6 +16,7 @@ Update your `.gitconfig` file (either global or per repository) :
 
     [merge]
     tool = amt
+    conflictstyle = diff3
     [mergetool "amt"]
     cmd = /path/to/ArachneMergeTool.py -b "$BASE" -l "$LOCAL" -r "$REMOTE" -m "$MERGED"
 
@@ -23,7 +24,10 @@ or just type the following in a shell prompt :
 
 
     $ git config --global merge.tool amt
+    $ git config --global merge.conflictstyle diff3
     $ git config --global mergetool.extMerge.cmd 'python /path/to/ArachneMergeTool.py -b "$BASE" -l "$LOCAL" -r "$REMOTE" -m "$MERGED"'
+
+Please note that most automatic conflict solvers need the `merge.conflictstyle` property set to diff3 to work properly
 
 
 ## Configuration

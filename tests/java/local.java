@@ -13,4 +13,14 @@ import java.util.Locale;
 
 public class Test {
 
+    int i;
+    float f;
+    short s;
+
+    public Test(){
+        i = 42;
+        f = 3.1416f;
+        s = 2;
+    }
+
 }
