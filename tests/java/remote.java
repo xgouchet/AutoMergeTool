@@ -27,4 +27,8 @@ public class Test {
         s = 12;
     }
 
+    public boolean bar (int j) {
+        return i%j == 0;
+    }
+
 }

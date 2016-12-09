@@ -23,4 +23,7 @@ public class Test {
         s = 2;
     }
 
+    void foo() {
+    }
+
 }

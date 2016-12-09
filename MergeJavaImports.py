@@ -188,6 +188,7 @@ def apply_imports(filename, imports):
                 conflict_content = line
             else:
                 f.write(line)
+    f.close()
     return complete
 
 

@@ -67,7 +67,28 @@ This tool will handle any conflict within the imports section of your java files
 You can add the following options :
  - **mergetool.mji.order** : specify the way to order imports. Presets include Android Studio : `android`; IntelliJ Idea : `idea`; and Eclipse : `eclipse`
 
+#### MergeAdditionConflicts
 
+This tool will handle any conflict for which the local and remote versions add content in the same place
+
+You can add the following options :
+ - **mergetool.mac.order** : sets the preference when adding both sides; can be `remotefirst` (default), `localfirst`, or `ask`
+ - **mergetool.mac.report** : sets the type of report to write next to the merged file (if the merged file is `foo.ext`, the report will be `foo.ext.mac`)
+    - `solved` : logs all the conflicts solved by the tool (and how it was solved
+    - `unsolved` : logs all the unsolved conflicts
+    - `full` : logs both the solved and unsolved conflicts
+    - `none` : doesn't write a report file
+
+#### MergeWovenConflicts
+
+This tool will handle any conflict for which the local and remote modify different lines. 
+
+You can add the following options :
+ - **mergetool.mwc.report** : sets the type of report to write next to the merged file (if the merged file is `foo.ext`, the report will be `foo.ext.mwc`)
+    - `solved` : logs all the conflicts solved by the tool (and how it was solved
+    - `unsolved` : logs all the unsolved conflicts
+    - `full` : logs both the solved and unsolved conflicts
+    - `none` : doesn't write a report file
 
 ## Caveats
 
@@ -90,3 +111,4 @@ If you want to contribute, pull requests are welcome, and you can also report is
 ## License
 
 This program is distributed under the [Apache License 2.0](https://opensource.org/licenses/Apache-2.0)
+ 

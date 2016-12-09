@@ -25,17 +25,20 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
 # TODO based on git's internal mergetool code, create defaults for known tools
 KNOWN_PATHS = {
     'mji': CURRENT_DIR + '/MergeJavaImports.py',
+    'mac': CURRENT_DIR + '/MergeAdditionConflicts.py',
     'mwc': CURRENT_DIR + '/MergeWovenConflicts.py'
 }
 KNOWN_CMDS = {
-    'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE" ',
-    'mji': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED ',
-    'mwc': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED '
+    'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
+    'mji': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
+    'mac': '{0} -m $MERGED',
+    'mwc': '{0} -m $MERGED'
 }
 
 KNOWN_TRUSTS = {
     'meld': False,
     'mji': True,
+    'mac': True,
     'mwc': True
 }
 
@@ -127,7 +130,7 @@ def get_tool_cmd(tool, config):
                     pass
                 if (option == OPT_TRUST_EXIT_CODE):
                     pass
-                cmd += "--{0} {1}".format(option, config.get(section, option))
+                cmd += " --{0} {1}".format(option, config.get(section, option))
         return cmd
 
     # No Default

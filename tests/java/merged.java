@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 <<<<<<< LOCAL
 
 import android.media.AudioManager;
+|||||||
+import android.action.Foo;
 =======
 
 import android.annotation.SuppressLint;
@@ -19,6 +21,8 @@ import org.greenrobot.eventbus.EventBus;
 
 <<<<<<< LOCAL
 import java.lang.String;
+|||||||
+import android.action.Foo;
 =======
 import java.lang.Integer;
 >>>>>>> REMOTE
@@ -35,11 +39,25 @@ public class Test {
         i = 42;
         f = 3.1416f;
         s = 2;
+|||||||
+        i = 42;
+        f = 3.14f;
+        s = 2;
 =======
         i = 421;
         f = 3.14f;
         s = 12;
 >>>>>>> REMOTE
     }
+
+<<<<<<< LOCAL
+    void foo() {
+    }
+|||||||
+=======
+    public boolean bar (int j) {
+        return i%j == 0;
+    }
+>>>>>>> REMOTE
 
 }
