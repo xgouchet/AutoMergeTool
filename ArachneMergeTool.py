@@ -35,12 +35,7 @@ KNOWN_CMDS = {
     'mwc': '{0} -m $MERGED'
 }
 
-KNOWN_TRUSTS = {
-    'meld': False,
-    'mji': True,
-    'mac': True,
-    'mwc': True
-}
+KNOWN_TRUSTS = {'meld': False, 'mji': True, 'mac': True, 'mwc': True}
 
 
 def parse_arguments():
@@ -180,7 +175,7 @@ def merge(config, args):
             # TODO analyse the merged file and look for conflicts
             print(" [AMT] ? {0} returned".format(tool))
 
-    print (" [AMT] ⚑ Sorry, it seems we can't solve it this time")
+    print(" [AMT] ⚑ Sorry, it seems we can't solve it this time")
     return result
 
 

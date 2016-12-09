@@ -21,7 +21,7 @@ class Conflict:
     versions
     """
 
-    def __init__(self, local, base, remote,raw):
+    def __init__(self, local, base, remote, raw):
         self.local = local
         self.base = base
         self.remote = remote
@@ -41,7 +41,6 @@ class ConflictsWalker:
     and rewrite the merged file if needed
     """
 
-
     def __init__(self, merged, report_name, report_type):
         self.conflicted = merged
         self.merged = merged + ".resolving.amt"
@@ -52,10 +51,9 @@ class ConflictsWalker:
         if report_name and report_type and report_type != REPORT_NONE:
             self.report_file = open(merged + "." + report_name, 'w')
             self.report_type = report_type
-        else :
+        else:
             self.report_file = None
             self.report_type = REPORT_NONE
-
 
     def has_more_conflicts(self):
         self.write_previous_conflict()
@@ -70,15 +68,18 @@ class ConflictsWalker:
         sections = ["", "", ""]
         section_index = 0
         sections_filled = 0
-        while (not eof) and (not(conflict_started and conflict_ended)):
+        while (not eof) and (not (conflict_started and conflict_ended)):
             line = self.conflicted_file.readline()
             if line == "":
                 eof = True
             if line.startswith(CONFLICT_END):
-                if not conflict_started :
+                if not conflict_started:
                     raise RuntimeError("Found conflict ending tag without starting tag")
-                if sections_filled != 3 :
-                    raise RuntimeError("Conflict is missing the base content. Try running : \n$ git config --global merge.conflictstyle diff3")
+                if sections_filled != 3:
+                    raise RuntimeError(
+                        "Conflict is missing the base content. Try running : \n"
+                        "$ git config --global merge.conflictstyle diff3"
+                    )
                 raw_conflict += line
                 conflict_ended = True
             elif line.startswith(CONFLICT_START):
@@ -87,29 +88,29 @@ class ConflictsWalker:
                 section_index = 0
                 sections_filled += 1
             elif line.startswith(CONFLICT_BASE):
-                if not conflict_started :
+                if not conflict_started:
                     raise RuntimeError("Found conflict base tag without starting tag")
                 raw_conflict += line
                 section_index = 1
                 sections_filled += 1
             elif line.startswith(CONFLICT_SEP):
-                if not conflict_started :
+                if not conflict_started:
                     raise RuntimeError("Found conflict separation tag without starting tag")
                 raw_conflict += line
                 section_index = 2
                 sections_filled += 1
             else:
-                if conflict_started :
+                if conflict_started:
                     raw_conflict += line
                     sections[section_index] += line
-                else :
+                else:
                     self.merged_file.write(line)
-        if (eof) :
+        if (eof):
             return False
-        else :
-            self.conflict = Conflict(sections[0], sections[1], sections[2], raw_conflict)
+        else:
+            self.conflict = Conflict(sections[0], sections[1], sections[2],
+                                     raw_conflict)
             return True
-
 
     def next_conflict(self):
         return self.conflict
@@ -129,7 +130,7 @@ class ConflictsWalker:
         """
         if self.has_remaining_conflicts:
             return 1
-        else :
+        else:
             return 0
 
     def write_previous_conflict(self):
@@ -139,7 +140,7 @@ class ConflictsWalker:
         if self.conflict != None:
             if self.conflict.is_resolved():
                 self.merged_file.write(self.conflict.resolution)
-            else :
+            else:
                 self.merged_file.write(self.conflict.raw)
                 self.has_remaining_conflicts = True
 
@@ -149,19 +150,23 @@ class ConflictsWalker:
         """
         if self.report_file and self.report_type != REPORT_NONE:
             if self.conflict != None:
-                if self.conflict.is_resolved() :
-                    if (self.report_type == REPORT_SOLVED) or (self.report_type == REPORT_FULL):
-                        self.report_file.write(    "\n*******  CONFLICT  *******\n")
+                if self.conflict.is_resolved():
+                    if (self.report_type == REPORT_SOLVED) or (
+                            self.report_type == REPORT_FULL):
+                        self.report_file.write(
+                            "\n*******  CONFLICT  *******\n")
                         self.report_file.write(self.conflict.raw)
-                        self.report_file.write("\nv v v v RESOLUTION v v v v\n")
+                        self.report_file.write(
+                            "\nv v v v RESOLUTION v v v v\n")
                         self.report_file.write(self.conflict.resolution)
-                elif (self.report_type == REPORT_UNSOLVED) or (self.report_type == REPORT_FULL):
+                elif (self.report_type == REPORT_UNSOLVED) or (
+                        self.report_type == REPORT_FULL):
                     self.report_file.write("\n××××××× UNRESOLVED ×××××××\n")
                     self.report_file.write(self.conflict.raw)
 
 
-
 if __name__ == '__main__':
-    print ("This is a utility module, not to be launched by itself, except for tests.")
+    print(
+        "This is a utility module, not to be launched by itself, except for tests."
+    )
     sys.exit(1)
-
