@@ -41,7 +41,7 @@ class ConflictsWalker:
     and rewrite the merged file if needed
     """
 
-    def __init__(self, merged, report_name, report_type):
+    def __init__(self, merged, report_name = None, report_type = REPORT_NONE):
         self.conflicted = merged
         self.merged = merged + ".resolving.amt"
         self.conflicted_file = open(self.conflicted)
@@ -115,12 +115,16 @@ class ConflictsWalker:
     def next_conflict(self):
         return self.conflict
 
-    def end(self):
+    def end(self, apply = True):
         self.conflicted_file.close()
         self.merged_file.close()
-        os.rename(self.merged, self.conflicted)
+
+        if apply:
+            os.rename(self.merged, self.conflicted)
+
         if self.report_file:
             self.report_file.close()
+
 
     def get_merge_status(self):
         """
@@ -135,7 +139,7 @@ class ConflictsWalker:
 
     def write_previous_conflict(self):
         """
-        Writes the last conflict to the merged file (either the resolution or the original conflict
+        Writes the last conflict to the merged file (either the resolution or the original conflict)
         """
         if self.conflict != None:
             if self.conflict.is_resolved():
