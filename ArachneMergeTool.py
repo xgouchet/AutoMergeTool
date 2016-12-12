@@ -18,6 +18,7 @@ OPT_KEEP_REPORTS = 'keepReport'
 SECT_TOOL_FORMAT = 'mergetool "{0}"'
 OPT_PATH = 'path'
 OPT_CMD = 'cmd'
+OPT_EXTENSIONS = 'extensions'
 OPT_TRUST_EXIT_CODE = 'trustExitCode'
 
 CURRENT_FRAME = inspect.getfile(inspect.currentframe())
@@ -36,6 +37,7 @@ KNOWN_CMDS = {
     'mwc': '{0} -m $MERGED'
 }
 KNOWN_TRUSTS = {'meld': False, 'mji': True, 'mac': True, 'mwc': True}
+KNOWN_EXTENSIONS = {'mji': 'java'}
 
 
 def parse_arguments():
@@ -87,6 +89,28 @@ def get_tool_trust(tool, config):
 
     # Default
     return False
+
+def get_tool_extensions(tool, config):
+    """
+    Get the extensions list the given tool can work on
+    tool -- the name of the tool
+    config -- the current amt configuration
+    """
+    extensions = None
+
+    # Known tools extensions
+    if tool in KNOWN_EXTENSIONS:
+        extensions = KNOWN_EXTENSIONS[tool]
+
+    # Override in config
+    section = tool_section_name(tool)
+    if config.has_option(section, OPT_EXTENSIONS):
+        extensions = config.get(section, OPT_EXTENSIONS)
+
+    if extensions :
+        return extensions.split(';')
+    else:
+        return None
 
 
 def get_tool_path(tool, config):
@@ -161,7 +185,15 @@ def merge(config, args):
     tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
     result = 42
     for tool in tools:
-        print(" [AMT] → Trying merge with {0}".format(tool))
+        # TODO check file extension against tool preset / config
+        extensions = get_tool_extensions(tool, config)
+        if extensions :
+            file_name, file_ext = os.path.splitext(args.merged)
+            file_ext = file_ext[1:]
+            if file_ext not in extensions :
+                print(" [AMT] — Ignoring tool {0} (bad extension : {1})".format(tool, file_ext))
+                continue
+
         # prepare the command line invocation
         print(" [AMT] → Trying merge with {0}".format(tool))
         cmd = get_tool_cmd(tool, config)
