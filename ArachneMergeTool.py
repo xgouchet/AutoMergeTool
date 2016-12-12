@@ -9,7 +9,7 @@ import sys
 import configparser
 
 # CONSTANTS
-DEFAULT_CONFIG = os.path.expanduser('~/.amtconfig')
+GLOBAL_CONFIG = os.path.expanduser('~/.amtconfig')
 
 SECT_AMT = 'ArachneMergeTool'
 OPT_TOOLS = 'tools'
@@ -52,7 +52,6 @@ def parse_arguments():
     parser.add_argument('-l', '--local', required=True)
     parser.add_argument('-r', '--remote', required=True)
     parser.add_argument('-m', '--merged', required=True)
-    parser.add_argument('-c', '--config', default=DEFAULT_CONFIG)
 
     return parser.parse_args()
 
@@ -62,7 +61,9 @@ def read_config(config_path):
     Reads the AMT configuration from the given path
     """
     config = configparser.RawConfigParser()
-    config.read(config_path)
+    config.read_file(open(GLOBAL_CONFIG))
+    if config_path :
+        config.read(config_path)
     return config
 
 
@@ -234,10 +235,30 @@ def clean_reports(merged):
         if file.startswith(base_name) and file.endswith('-report'):
             os.remove(file)
 
+def find_local_config(file):
+    """
+    Finds the nearest parent directory where there is a .git folder
+    """
+    parent = os.path.dirname(file)
+    if (parent == file) :
+        return None
+
+    git = os.path.join(parent, ".git")
+    if os.path.exists(git) :
+        config = os.path.join(git, "amtconfig")
+        if os.path.exists(config):
+            return config
+        else :
+            return None
+    else :
+        return find_local_config(parent)
+
+
 if __name__ == '__main__':
     print("ArachneMergeTool kickin' in !")
     args = parse_arguments()
-    config = read_config(os.path.expanduser(args.config))
+    local_config = find_local_config(args.merged)
+    config = read_config(local_config)
     result = merge(config, args)
 
     if result == 0:
