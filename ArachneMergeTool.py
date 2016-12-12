@@ -9,10 +9,11 @@ import sys
 import configparser
 
 # CONSTANTS
-DEFAULT_CONFIG = '~/.amtconfig'
+DEFAULT_CONFIG = os.path.expanduser('~/.amtconfig')
 
 SECT_AMT = 'ArachneMergeTool'
 OPT_TOOLS = 'tools'
+OPT_KEEP_REPORTS = 'keepReport'
 
 SECT_TOOL_FORMAT = 'mergetool "{0}"'
 OPT_PATH = 'path'
@@ -22,24 +23,25 @@ OPT_TRUST_EXIT_CODE = 'trustExitCode'
 CURRENT_FRAME = inspect.getfile(inspect.currentframe())
 CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
 
-# TODO based on git's internal mergetool code, create defaults for known tools
 KNOWN_PATHS = {
     'mji': CURRENT_DIR + '/MergeJavaImports.py',
     'mac': CURRENT_DIR + '/MergeAdditionConflicts.py',
     'mwc': CURRENT_DIR + '/MergeWovenConflicts.py'
 }
+# TODO based on git's internal mergetool code, create defaults for known tools
 KNOWN_CMDS = {
     'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
     'mji': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
     'mac': '{0} -m $MERGED',
     'mwc': '{0} -m $MERGED'
 }
-
 KNOWN_TRUSTS = {'meld': False, 'mji': True, 'mac': True, 'mwc': True}
 
 
 def parse_arguments():
-    """Parses the arguments passed on invocation in a dict and return it"""
+    """
+    Parses the arguments passed on invocation in a dict and return it
+    """
     parser = argparse.ArgumentParser(
         description="A tool to combine multiple merge tools")
 
@@ -53,7 +55,9 @@ def parse_arguments():
 
 
 def read_config(config_path):
-    """Reads the AMT configuration from the given path"""
+    """
+    Reads the AMT configuration from the given path
+    """
     config = configparser.RawConfigParser()
     config.read(config_path)
     return config
@@ -62,7 +66,7 @@ def read_config(config_path):
 def tool_section_name(tool):
     """
     Generates the mergetool section name for the given tool
-    eg : tool_section_name("foo") →
+    eg : tool_section_name("foo") → [mergetool "foo"]
     """
     return SECT_TOOL_FORMAT.format(tool)
 
@@ -129,8 +133,7 @@ def get_tool_cmd(tool, config):
         return cmd
 
     # No Default
-    print("Unknown tool {0}".format(tool))
-    sys.exit(1)
+    return None
 
 
 def expand_arguments(cmd, args):
@@ -160,7 +163,12 @@ def merge(config, args):
     for tool in tools:
         print(" [AMT] → Trying merge with {0}".format(tool))
         # prepare the command line invocation
+        print(" [AMT] → Trying merge with {0}".format(tool))
         cmd = get_tool_cmd(tool, config)
+        if cmd == None:
+            print(" [AMT] — Ignoring tool {0} (unknown tool)".format(tool))
+            continue
+
         cmd = expand_arguments(cmd, args)
         result = subprocess.call(cmd.split(), shell=False)
 
@@ -178,10 +186,29 @@ def merge(config, args):
     print(" [AMT] ⚑ Sorry, it seems we can't solve it this time")
     return result
 
+def clean_reports(merged):
+    """
+    Cleans up the reports for the given file
+    """
+    if config.has_option(SECT_AMT, OPT_KEEP_REPORTS):
+        if config.get(SECT_AMT, OPT_KEEP_REPORTS) == "true":
+            return
+    print (" [AMT] * Cleaning up reports")
+    abs_path = os.path.abspath(merged)
+    base_name = os.path.basename(merged) + '.'
+    dir_path = os.path.dirname(abs_path)
+    for file in os.listdir(dir_path):
+        if file.startswith(base_name) and file.endswith('-report'):
+            os.remove(file)
 
 if __name__ == '__main__':
     print("ArachneMergeTool kickin' in !")
     args = parse_arguments()
     config = read_config(os.path.expanduser(args.config))
     result = merge(config, args)
+
+    if result == 0:
+        clean_reports(args.merged)
+
     sys.exit(result)
+
