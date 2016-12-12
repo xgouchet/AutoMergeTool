@@ -170,7 +170,5 @@ class ConflictsWalker:
 
 
 if __name__ == '__main__':
-    print(
-        "This is a utility module, not to be launched by itself, except for tests."
-    )
+    print("This is just a utility module, not to be launched directly.")
     sys.exit(1)

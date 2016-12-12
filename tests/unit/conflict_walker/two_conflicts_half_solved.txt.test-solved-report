@@ -1,0 +1,12 @@
+
+*******  CONFLICT  *******
+<<<<<<< LOCAL
+Nulla purus tortor, ornare at dolor quis, maximus pharetra neque. Pellentesque eget felis et orci rhoncus tempor. Nulla auctor posuere 
+nisl. Vivamus dignissim a nisl sit amet dapibus.
+|||||||
+=======
+Sed sodales eros non leo iaculis laoreet. Nulla et lobortis massa. Pellentesque sit amet suscipit augue.
+>>>>>>> REMOTE
+
+v v v v RESOLUTION v v v v
+Nunc quis interdum nunc. Praesent mollis risus enim, at elementum quam finibus ut.
