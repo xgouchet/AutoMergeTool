@@ -31,7 +31,6 @@ def handle_conflict(conflict):
         return
     if len(lines_remote) != len(lines_base):
         return
-    print("Maybe woven ?!")
     lines_count = len(lines_base)
     resolution = ""
     for l in range(lines_count):

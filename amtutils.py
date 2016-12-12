@@ -49,7 +49,7 @@ class ConflictsWalker:
         self.conflict = None
         self.has_remaining_conflicts = False
         if report_name and report_type and report_type != REPORT_NONE:
-            self.report_file = open(merged + "." + report_name, 'w')
+            self.report_file = open(merged + "." + report_name + "-report", 'w')
             self.report_type = report_type
         else:
             self.report_file = None
