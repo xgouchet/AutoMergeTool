@@ -12,8 +12,7 @@ ORDER_ASK = "ask"
 
 def parse_arguments():
     """Parses the arguments passed on invocation in a dict and return it"""
-    parser = argparse.ArgumentParser(
-        description="A tool to resolve addition conflicts")
+    parser = argparse.ArgumentParser(description="A tool to resolve addition conflicts")
 
     parser.add_argument('-m', '--merged', required=True)
     parser.add_argument(
@@ -44,8 +43,7 @@ def handle_conflict(conflict, order):
         print(">>>>>>> REMOTE")
         print(conflict.remote)
         choice = input(
-            "Select action : [1] Remote First / [2] Local First / [0] Ignore conflict : "
-        )
+            "Select action : [1] Remote First / [2] Local First / [0] Ignore conflict : ")
         if choice == '0':
             return
         elif choice == '1':

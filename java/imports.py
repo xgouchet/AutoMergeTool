@@ -16,16 +16,13 @@ CONFLICT_END = ">>>>>>>"
 
 IMPORT_GROUPS = []
 
-IMPORT_GROUPS_ANDROID = [
-    ("import android.", 0), ("import com.", 1), ("import junit.", 2),
-    ("import net.", 3), ("import org.", 4), ("import java.", 5),
-    ("import javax.", 6), ("import ", 7), ("import static ", 8)
-]
-IMPORT_GROUPS_IJ_IDEA = [("import ", 0), ("import javax.", 1),
-                         ("import java.", 2), ("import static ", 3)]
-IMPORT_GROUPS_ECLIPSE = [("import static ", 0), ("import java.", 1),
-                         ("import javax.", 2), ("import org.", 3),
-                         ("import com.", 4), ("import ", 5)]
+IMPORT_GROUPS_ANDROID = [("import android.", 0), ("import com.", 1), ("import junit.", 2),
+                         ("import net.", 3), ("import org.", 4), ("import java.", 5),
+                         ("import javax.", 6), ("import ", 7), ("import static ", 8)]
+IMPORT_GROUPS_IJ_IDEA = [("import ", 0), ("import javax.", 1), ("import java.", 2),
+                         ("import static ", 3)]
+IMPORT_GROUPS_ECLIPSE = [("import static ", 0), ("import java.", 1), ("import javax.", 2),
+                         ("import org.", 3), ("import com.", 4), ("import ", 5)]
 
 ORDER_ANDROID = "android"
 ORDER_IJ_IDEA = "idea"
@@ -40,18 +37,14 @@ IMPORT_PRESETS = {
 
 def parse_arguments():
     """Parses the arguments passed on invocation in a dict and return it"""
-    parser = argparse.ArgumentParser(
-        description="A tool to combine multiple merge tools")
+    parser = argparse.ArgumentParser(description="A tool to combine multiple merge tools")
 
     parser.add_argument('-b', '--base', required=True)
     parser.add_argument('-l', '--local', required=True)
     parser.add_argument('-r', '--remote', required=True)
     parser.add_argument('-m', '--merged', required=True)
     parser.add_argument(
-        '-o',
-        '--order',
-        choices=[ORDER_ECLIPSE, ORDER_IJ_IDEA, ORDER_ANDROID],
-        required=False)
+        '-o', '--order', choices=[ORDER_ECLIPSE, ORDER_IJ_IDEA, ORDER_ANDROID], required=False)
     parser.add_argument('-c', '--customorder', required=False)
 
     return parser.parse_args()
@@ -111,9 +104,7 @@ def set_import_groups(preset=None):
     if (preset != None):
         if preset in IMPORT_PRESETS:
             IMPORT_GROUPS = sorted(
-                IMPORT_PRESETS[preset],
-                key=lambda grp: len(grp[0]),
-                reverse=True)
+                IMPORT_PRESETS[preset], key=lambda grp: len(grp[0]), reverse=True)
 
 
 def get_import_group(imp):
@@ -168,8 +159,7 @@ def apply_imports(filename, imports):
                     if keep_conflict:
                         complete = False
                         f.write(conflict_content)
-                elif line.startswith(CONFLICT_SEP) or line.startswith(
-                        CONFLICT_BASE):
+                elif line.startswith(CONFLICT_SEP) or line.startswith(CONFLICT_BASE):
                     continue
                 elif re.match(IMPORT_REGEX, line):
                     continue
@@ -202,8 +192,7 @@ def has_merged_conflicts(merged_filename):
             if (conflict):
                 if line.startswith(CONFLICT_END):
                     conflict = False
-                elif line.startswith(CONFLICT_SEP) or line.startswith(
-                        CONFLICT_BASE):
+                elif line.startswith(CONFLICT_SEP) or line.startswith(CONFLICT_BASE):
                     continue
                 elif re.match(IMPORT_REGEX, line):
                     return True

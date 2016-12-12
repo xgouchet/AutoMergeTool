@@ -10,8 +10,8 @@ CW_PATH = 'tests/unit/conflict_walker/{0}.txt'
 
 RESOLUTION = "Nunc quis interdum nunc. Praesent mollis risus enim, at elementum quam finibus ut.\n"
 
-class ConflictTest(unittest.TestCase):
 
+class ConflictTest(unittest.TestCase):
     def test_no_conflicts(self):
         """Tests a walker against a file without conflicts"""
 
@@ -76,13 +76,15 @@ class ConflictTest(unittest.TestCase):
         conflict = walker.next_conflict()
         conflict.resolve(RESOLUTION)
         self.assertTrue(walker.has_more_conflicts())
-        conflict = walker.next_conflict() # not solved
+        conflict = walker.next_conflict()  # not solved
         self.assertFalse(walker.has_more_conflicts())
         walker.end(False)
 
         # Then check the output
         self.assertTrue(filecmp.cmp(walker.merged, CW_PATH.format('two_conflicts_half_solved')))
-        self.assertTrue(filecmp.cmp(file + '.test-report', CW_PATH.format('two_conflicts_half_solved') + '.test-full-report'))
+        self.assertTrue(
+            filecmp.cmp(file + '.test-report',
+                        CW_PATH.format('two_conflicts_half_solved') + '.test-full-report'))
         self.assertEquals(walker.get_merge_status(), 1)
         os.remove(walker.merged)
 
@@ -98,13 +100,15 @@ class ConflictTest(unittest.TestCase):
         conflict = walker.next_conflict()
         conflict.resolve(RESOLUTION)
         self.assertTrue(walker.has_more_conflicts())
-        conflict = walker.next_conflict() # not solved
+        conflict = walker.next_conflict()  # not solved
         self.assertFalse(walker.has_more_conflicts())
         walker.end(False)
 
         # Then check the output
         self.assertTrue(filecmp.cmp(walker.merged, CW_PATH.format('two_conflicts_half_solved')))
-        self.assertTrue(filecmp.cmp(file + '.test-report', CW_PATH.format('two_conflicts_half_solved') + '.test-solved-report'))
+        self.assertTrue(
+            filecmp.cmp(file + '.test-report',
+                        CW_PATH.format('two_conflicts_half_solved') + '.test-solved-report'))
         self.assertEquals(walker.get_merge_status(), 1)
         os.remove(walker.merged)
 
@@ -120,16 +124,17 @@ class ConflictTest(unittest.TestCase):
         conflict = walker.next_conflict()
         conflict.resolve(RESOLUTION)
         self.assertTrue(walker.has_more_conflicts())
-        conflict = walker.next_conflict() # not solved
+        conflict = walker.next_conflict()  # not solved
         self.assertFalse(walker.has_more_conflicts())
         walker.end(False)
 
         # Then check the output
         self.assertTrue(filecmp.cmp(walker.merged, CW_PATH.format('two_conflicts_half_solved')))
-        self.assertTrue(filecmp.cmp(file + '.test-report', CW_PATH.format('two_conflicts_half_solved') + '.test-unsolved-report'))
+        self.assertTrue(
+            filecmp.cmp(file + '.test-report',
+                        CW_PATH.format('two_conflicts_half_solved') + '.test-unsolved-report'))
         self.assertEquals(walker.get_merge_status(), 1)
         os.remove(walker.merged)
-
 
     def test_missing_base_side(self):
         """Tests a walker against a file with conflicts without the `diff3` conflict style"""
@@ -186,7 +191,6 @@ class ConflictTest(unittest.TestCase):
 
         walker.end(False)
         os.remove(walker.merged)
-
 
 
 if __name__ == '__main__':

@@ -8,7 +8,7 @@ from amtutils import *
 
 def parse_arguments():
     """Parses the arguments passed on invocation in a dict and return it"""
-    parser = argparse.ArgumentParser(description="A tool to resolve dummy conflicts")
+    parser = argparse.ArgumentParser(description="A tool to resolve woven conflicts")
 
     parser.add_argument('-m', '--merged', required=True)
     parser.add_argument(
@@ -23,14 +23,25 @@ def parse_arguments():
 
 def handle_conflict(conflict):
     """Handle a conflicts where the changes are woven"""
-    print ("The base side of the conflict was :\n" + conflict.base)
-    print ("The local side of the conflict is :\n" + conflict.local)
-    print ("The remote side of the conflict is :\n" + conflict.remote)
-
-    # Here's where you'd try to handle the conflict.
-    # If it's possible to fix the conflict, call `conflict.resolve(resolution)`
-    # Where resolution is the conflict's resolution, as it should appear in the final file
-    # If you can't (or don't want to) resolve the conflict, leave the conflict as is
+    lines_local = conflict.local.split('\n')
+    lines_base = conflict.base.split('\n')
+    lines_remote = conflict.remote.split('\n')
+    if len(lines_local) != len(lines_base):
+        return
+    if len(lines_remote) != len(lines_base):
+        return
+    lines_count = len(lines_base)
+    resolution = ""
+    for l in range(lines_count):
+        if lines_local[l] == lines_base[l]:
+            resolution += lines_remote[l] + '\n'
+        elif lines_remote[l] == lines_base[l]:
+            resolution += lines_local[l] + '\n'
+        else:
+            # neither match, harder conflict, return early
+            return
+    # all lines solved :)
+    conflict.resolve(resolution)
 
 
 if __name__ == '__main__':

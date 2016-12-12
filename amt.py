@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import argparse
@@ -11,7 +11,7 @@ import configparser
 # CONSTANTS
 GLOBAL_CONFIG = os.path.expanduser('~/.amtconfig')
 
-SECT_AMT = 'ArachneMergeTool'
+SECT_AMT = 'amt'
 OPT_TOOLS = 'tools'
 OPT_KEEP_REPORTS = 'keepReport'
 
@@ -25,28 +25,27 @@ CURRENT_FRAME = inspect.getfile(inspect.currentframe())
 CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
 
 KNOWN_PATHS = {
-    'mji': CURRENT_DIR + '/MergeJavaImports.py',
-    'mac': CURRENT_DIR + '/MergeAdditionConflicts.py',
-    'mwc': CURRENT_DIR + '/MergeWovenConflicts.py'
+    'java_imports': CURRENT_DIR + 'java/imports.py',
+    'gen_additions': CURRENT_DIR + 'generics/additions.py',
+    'gen_woven': CURRENT_DIR + 'generics/woven_conflicts.py'
 }
 # TODO based on git's internal mergetool code, create defaults for known tools
 KNOWN_CMDS = {
     'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
     'opendiff': '"{0}" "$LOCAL" "$REMOTE" -ancestor "$BASE" -merge "$MERGED" | cat',
-    'mji': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
-    'mac': '{0} -m $MERGED',
-    'mwc': '{0} -m $MERGED'
+    'java_imports': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
+    'gen_additions': '{0} -m $MERGED',
+    'gen_woven': '{0} -m $MERGED'
 }
-KNOWN_TRUSTS = {'meld': False, 'mji': True, 'mac': True, 'mwc': True}
-KNOWN_EXTENSIONS = {'mji': 'java'}
+KNOWN_TRUSTS = {'java_imports': True, 'gen_additions': True, 'gen_woven': True}
+KNOWN_EXTENSIONS = {'java_imports': 'java'}
 
 
 def parse_arguments():
     """
     Parses the arguments passed on invocation in a dict and return it
     """
-    parser = argparse.ArgumentParser(
-        description="A tool to combine multiple merge tools")
+    parser = argparse.ArgumentParser(description="A tool to combine multiple merge tools")
 
     parser.add_argument('-b', '--base', required=True)
     parser.add_argument('-l', '--local', required=True)
@@ -62,7 +61,7 @@ def read_config(config_path):
     """
     config = configparser.RawConfigParser()
     config.read_file(open(GLOBAL_CONFIG))
-    if config_path :
+    if config_path:
         config.read(config_path)
     return config
 
@@ -92,6 +91,7 @@ def get_tool_trust(tool, config):
     # Default
     return False
 
+
 def get_tool_extensions(tool, config):
     """
     Get the extensions list the given tool can work on
@@ -109,7 +109,7 @@ def get_tool_extensions(tool, config):
     if config.has_option(section, OPT_EXTENSIONS):
         extensions = config.get(section, OPT_EXTENSIONS)
 
-    if extensions :
+    if extensions:
         return extensions.split(';')
     else:
         return None
@@ -182,17 +182,16 @@ def merge(config, args):
     args -- the arguments with the base, local, remote and merged filenames
     """
     if (not (config.has_option(SECT_AMT, OPT_TOOLS))):
-        raise RuntimeError('Missing the {0}.{1} configuration'.format(
-            SECT_AMT, OPT_TOOLS))
+        raise RuntimeError('Missing the {0}.{1} configuration'.format(SECT_AMT, OPT_TOOLS))
     tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
     result = 42
     for tool in tools:
         # TODO check file extension against tool preset / config
         extensions = get_tool_extensions(tool, config)
-        if extensions :
+        if extensions:
             file_name, file_ext = os.path.splitext(args.merged)
             file_ext = file_ext[1:]
-            if file_ext not in extensions :
+            if file_ext not in extensions:
                 print(" [AMT] — Ignoring tool {0} (bad extension : {1})".format(tool, file_ext))
                 continue
 
@@ -220,6 +219,7 @@ def merge(config, args):
     print(" [AMT] ⚑ Sorry, it seems we can't solve it this time")
     return result
 
+
 def clean_reports(merged):
     """
     Cleans up the reports for the given file
@@ -227,7 +227,7 @@ def clean_reports(merged):
     if config.has_option(SECT_AMT, OPT_KEEP_REPORTS):
         if config.get(SECT_AMT, OPT_KEEP_REPORTS) == "true":
             return
-    print (" [AMT] * Cleaning up reports")
+    print(" [AMT] * Cleaning up reports")
     abs_path = os.path.abspath(merged)
     base_name = os.path.basename(merged) + '.'
     dir_path = os.path.dirname(abs_path)
@@ -235,22 +235,23 @@ def clean_reports(merged):
         if file.startswith(base_name) and file.endswith('-report'):
             os.remove(file)
 
+
 def find_local_config(file):
     """
     Finds the nearest parent directory where there is a .git folder
     """
     parent = os.path.dirname(file)
-    if (parent == file) :
+    if (parent == file):
         return None
 
     git = os.path.join(parent, ".git")
-    if os.path.exists(git) :
+    if os.path.exists(git):
         config = os.path.join(git, "amtconfig")
         if os.path.exists(config):
             return config
-        else :
+        else:
             return None
-    else :
+    else:
         return find_local_config(parent)
 
 
@@ -265,4 +266,3 @@ if __name__ == '__main__':
         clean_reports(args.merged)
 
     sys.exit(result)
-

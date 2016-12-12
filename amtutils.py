@@ -41,7 +41,7 @@ class ConflictsWalker:
     and rewrite the merged file if needed
     """
 
-    def __init__(self, merged, report_name = None, report_type = REPORT_NONE):
+    def __init__(self, merged, report_name=None, report_type=REPORT_NONE):
         self.conflicted = merged
         self.merged = merged + ".resolving.amt"
         self.conflicted_file = open(self.conflicted)
@@ -76,10 +76,8 @@ class ConflictsWalker:
                 if not conflict_started:
                     raise RuntimeError("Found conflict ending tag without starting tag")
                 if sections_filled != 3:
-                    raise RuntimeError(
-                        "Conflict is missing the base content. Try running : \n"
-                        "$ git config --global merge.conflictstyle diff3"
-                    )
+                    raise RuntimeError("Conflict is missing the base content. Try running : \n"
+                                       "$ git config --global merge.conflictstyle diff3")
                 raw_conflict += line
                 conflict_ended = True
             elif line.startswith(CONFLICT_START):
@@ -108,14 +106,13 @@ class ConflictsWalker:
         if (eof):
             return False
         else:
-            self.conflict = Conflict(sections[0], sections[1], sections[2],
-                                     raw_conflict)
+            self.conflict = Conflict(sections[0], sections[1], sections[2], raw_conflict)
             return True
 
     def next_conflict(self):
         return self.conflict
 
-    def end(self, apply = True):
+    def end(self, apply=True):
         self.conflicted_file.close()
         self.merged_file.close()
 
@@ -124,7 +121,6 @@ class ConflictsWalker:
 
         if self.report_file:
             self.report_file.close()
-
 
     def get_merge_status(self):
         """
@@ -155,16 +151,12 @@ class ConflictsWalker:
         if self.report_file and self.report_type != REPORT_NONE:
             if self.conflict != None:
                 if self.conflict.is_resolved():
-                    if (self.report_type == REPORT_SOLVED) or (
-                            self.report_type == REPORT_FULL):
-                        self.report_file.write(
-                            "\n*******  CONFLICT  *******\n")
+                    if (self.report_type == REPORT_SOLVED) or (self.report_type == REPORT_FULL):
+                        self.report_file.write("\n*******  CONFLICT  *******\n")
                         self.report_file.write(self.conflict.raw)
-                        self.report_file.write(
-                            "\nv v v v RESOLUTION v v v v\n")
+                        self.report_file.write("\nv v v v RESOLUTION v v v v\n")
                         self.report_file.write(self.conflict.resolution)
-                elif (self.report_type == REPORT_UNSOLVED) or (
-                        self.report_type == REPORT_FULL):
+                elif (self.report_type == REPORT_UNSOLVED) or (self.report_type == REPORT_FULL):
                     self.report_file.write("\n××××××× UNRESOLVED ×××××××\n")
                     self.report_file.write(self.conflict.raw)
 

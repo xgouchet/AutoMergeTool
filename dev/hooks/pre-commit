@@ -1,0 +1,4 @@
+# Formatting the python 
+yapf -i -r --style='{based_on_style:pep8, COLUMN_LIMIT=100}' .
+
+# TODO running tests
