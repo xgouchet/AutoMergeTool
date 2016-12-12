@@ -32,6 +32,7 @@ KNOWN_PATHS = {
 # TODO based on git's internal mergetool code, create defaults for known tools
 KNOWN_CMDS = {
     'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
+    'opendiff': '"{0}" "$LOCAL" "$REMOTE" -ancestor "$BASE" -merge "$MERGED" | cat',
     'mji': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
     'mac': '{0} -m $MERGED',
     'mwc': '{0} -m $MERGED'
