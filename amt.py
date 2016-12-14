@@ -25,9 +25,9 @@ CURRENT_FRAME = inspect.getfile(inspect.currentframe())
 CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
 
 KNOWN_PATHS = {
-    'java_imports': CURRENT_DIR + 'java/imports.py',
-    'gen_additions': CURRENT_DIR + 'generics/additions.py',
-    'gen_woven': CURRENT_DIR + 'generics/woven_conflicts.py'
+    'java_imports': CURRENT_DIR + '/java_imports.py',
+    'gen_additions': CURRENT_DIR + '/gen_additions.py',
+    'gen_woven': CURRENT_DIR + '/gen_woven.py'
 }
 # TODO based on git's internal mergetool code, create defaults for known tools
 KNOWN_CMDS = {
