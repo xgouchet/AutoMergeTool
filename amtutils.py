@@ -164,23 +164,6 @@ class ConflictsWalker:
 
 
 
-def lcs(conflict):
-    """
-    Returns the longuest-common-subsequence between each parts of a conflict
-    """
-    b = conflict.base
-    l = conflict.local
-    r = conflict.remote
-    return lcs(b,l,r)
-
-def lcs(b, l, r):
-    """
-    Returns the longuest-common-subsequence between three strings
-    """
-    i = j = k = 0;
-    return ""
-
-
 if __name__ == '__main__':
     print("This is just a utility module, not to be launched directly.")
     sys.exit(1)
