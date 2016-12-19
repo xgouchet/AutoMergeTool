@@ -193,5 +193,34 @@ class ConflictTest(unittest.TestCase):
         os.remove(walker.merged)
 
 
+class LCSTest(unittest.TestCase):
+
+    def test_empty(self):
+        """Tests LCS for 3 empty strings"""
+        # Given strings to compare
+        b = ""
+        l = ""
+        r = ""
+
+        # When computing lcs
+        result = lcs(b, l, r)
+
+        # Then
+        self.assertEquals(result, "")
+
+    def test_simple(self):
+        """Tests LCS for 3 simple strings"""
+        # Given strings to compare
+        b = "He called you."
+        l = "Hell ! This one is bad ."
+        r = "Hey Lindsay, look."
+
+        # When computing lcs
+        result = lcs(b, l, r)
+
+        # Then
+        self.assertEquals(result, "Hello.")
+
+
 if __name__ == '__main__':
     unittest.main()

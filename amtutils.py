@@ -28,8 +28,10 @@ class Conflict:
         self.raw = raw
         self.resolution = None
 
+
     def resolve(self, resolution):
         self.resolution = resolution
+
 
     def is_resolved(self):
         return self.resolution != None
@@ -159,6 +161,24 @@ class ConflictsWalker:
                 elif (self.report_type == REPORT_UNSOLVED) or (self.report_type == REPORT_FULL):
                     self.report_file.write("\n××××××× UNRESOLVED ×××××××\n")
                     self.report_file.write(self.conflict.raw)
+
+
+
+def lcs(conflict):
+    """
+    Returns the longuest-common-subsequence between each parts of a conflict
+    """
+    b = conflict.base
+    l = conflict.local
+    r = conflict.remote
+    return lcs(b,l,r)
+
+def lcs(b, l, r):
+    """
+    Returns the longuest-common-subsequence between three strings
+    """
+    i = j = k = 0;
+    return ""
 
 
 if __name__ == '__main__':
