@@ -27,6 +27,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
 KNOWN_PATHS = {
     'java_imports': CURRENT_DIR + '/java_imports.py',
     'gen_additions': CURRENT_DIR + '/gen_additions.py',
+    'gen_debug': CURRENT_DIR + '/gen_debug.py',
     'gen_woven': CURRENT_DIR + '/gen_woven.py'
 }
 # TODO based on git's internal mergetool code, create defaults for known tools
@@ -35,6 +36,7 @@ KNOWN_CMDS = {
     'opendiff': '"{0}" "$LOCAL" "$REMOTE" -ancestor "$BASE" -merge "$MERGED" | cat',
     'java_imports': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
     'gen_additions': '{0} -m $MERGED',
+    'gen_debug': '{0} -m $MERGED',
     'gen_woven': '{0} -m $MERGED'
 }
 KNOWN_TRUSTS = {'java_imports': True, 'gen_additions': True, 'gen_woven': True}
@@ -186,7 +188,10 @@ def merge(config, args):
     tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
     result = 42
     for tool in tools:
-        # TODO check file extension against tool preset / config
+        if (tool == None) or (tool == ""):
+            continue
+
+        # check file extension against tool preset / config
         extensions = get_tool_extensions(tool, config)
         if extensions:
             file_name, file_ext = os.path.splitext(args.merged)
@@ -233,7 +238,7 @@ def clean_reports(merged):
     dir_path = os.path.dirname(abs_path)
     for file in os.listdir(dir_path):
         if file.startswith(base_name) and file.endswith('-report'):
-            os.remove(file)
+            os.remove(os.path.join(dir_path, file))
 
 
 def find_local_config(file):
