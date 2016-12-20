@@ -25,10 +25,10 @@ def parse_arguments():
 def handle_conflict(conflict):
     """Handles a conflict which can be simplified"""
 
-    # Here we look at space resistant substrings (eg : "ab cd" is equal to "ab      cd")
-    lines_local = conflict.local.split('\n')[:-1]
-    lines_base = conflict.base.split('\n')[:-1]
-    lines_remote = conflict.remote.split('\n')[:-1]
+    # TODO override comparator to ignore \s+
+    lines_local = conflict.local_lines()
+    lines_base = conflict.base_lines()
+    lines_remote = conflict.remote_lines()
 
     # find common lines
     analyser = LCSAnalyser(concatenate=lambda a, b: list(a) + list(b))
@@ -45,23 +45,25 @@ def handle_conflict(conflict):
             # write conflict before subsequence
             resolution += conflict.marker_local
             for line in lines_local[il:sub.pos_l]:
-                resolution += line + "\n"
+                resolution += line
             resolution += CONFLICT_BASE + "\n"
             for line in lines_base[ib:sub.pos_b]:
-                resolution += line + "\n"
+                resolution += line
             resolution += CONFLICT_SEP + "\n"
             for line in lines_remote[ir:sub.pos_r]:
-                resolution += line + "\n"
+                resolution += line
             resolution += conflict.marker_remote
+
         # write subsequence
         if isinstance(sub.content, str):
             size = 1
-            resolution += sub.content + "\n"
+            resolution += sub.content
         else:
             size = len(list(sub.content))
             for line in list(sub.content):
-                resolution += line + "\n"
+                resolution += line
 
+        # increment indices
         ib = sub.pos_b + size
         il = sub.pos_l + size
         ir = sub.pos_r + size
@@ -69,13 +71,13 @@ def handle_conflict(conflict):
     if (ib < len(lines_base)) or (il < len(lines_local)) or (ir < len(lines_remote)):
         resolution += conflict.marker_local
         for line in lines_local[il:]:
-            resolution += line + "\n"
+            resolution += line
         resolution += CONFLICT_BASE + "\n"
         for line in lines_base[ib:]:
-            resolution += line + "\n"
+            resolution += line
         resolution += CONFLICT_SEP + "\n"
         for line in lines_remote[ir:]:
-            resolution += line + "\n"
+            resolution += line
         resolution += conflict.marker_remote
 
     conflict.rewrite(resolution)

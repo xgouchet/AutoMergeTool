@@ -192,6 +192,20 @@ class ConflictTest(unittest.TestCase):
         walker.end(False)
         os.remove(walker.merged)
 
+    def test_extract_lines(self):
+        """Tests how a conflict extracts lines from blocks"""
+
+        # Given a file to merge
+        local = "\n"  #empty
+        base = "foo\nbar\nbaz\neggs\nbacon\n"
+        remote = "hello world\n"
+        conflict = Conflict(local, base, remote, "<<<<<<<\n", ">>>>>>>\n")
+
+        # extracting lines
+        self.assertEqual(conflict.local_lines(), [])
+        self.assertEqual(conflict.base_lines(), ["foo\n", "bar\n", "baz\n", "eggs\n", "bacon\n"])
+        self.assertEqual(conflict.remote_lines(), ["hello world\n"])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -23,9 +23,9 @@ def parse_arguments():
 
 def handle_conflict(conflict):
     """Handle a conflicts where the changes are woven"""
-    lines_local = conflict.local.split('\n')[:-1]
-    lines_base = conflict.base.split('\n')[:-1]
-    lines_remote = conflict.remote.split('\n')[:-1]
+    lines_local = conflict.local_lines()
+    lines_base = conflict.base_lines()
+    lines_remote = conflict.remote_lines()
     if len(lines_local) != len(lines_base):
         return
     if len(lines_remote) != len(lines_base):
@@ -35,10 +35,10 @@ def handle_conflict(conflict):
     for l in range(lines_count):
         if lines_local[l] == lines_base[l]:
             if lines_remote[l] != "":
-                resolution += lines_remote[l] + '\n'
+                resolution += lines_remote[l]
         elif lines_remote[l] == lines_base[l]:
             if lines_local[l] != "":
-                resolution += lines_local[l] + '\n'
+                resolution += lines_local[l]
         else:
             # neither match, harder conflict, return early
             return

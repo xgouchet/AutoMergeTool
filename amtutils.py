@@ -14,6 +14,8 @@ REPORT_SOLVED = "solved"
 REPORT_UNSOLVED = "unsolved"
 REPORT_FULL = "full"
 
+# TODO add docstrings for this file
+
 
 class Conflict:
     """
@@ -43,6 +45,21 @@ class Conflict:
 
     def is_resolved(self):
         return self.resolved
+
+    def local_lines(self):
+        return self.__lines(self.local)
+
+    def base_lines(self):
+        return self.__lines(self.base)
+
+    def remote_lines(self):
+        return self.__lines(self.remote)
+
+    def __lines(self, block):
+        lines = block.split('\n')
+        filtered = list(filter(lambda x: len(x) > 0, lines))
+        mapped = list(map(lambda x: x + "\n", filtered))
+        return mapped
 
 
 class ConflictsWalker:

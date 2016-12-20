@@ -7,18 +7,13 @@ class LCSAnalyser:
     A utility class able to find the LCS between three strings / arrays
     """
 
-    def __init__(self, comparator=lambda a, b: a == b, concatenate=lambda a, b: a + b):
+    def __init__(self,
+                 comparator=lambda a, b: a == b,
+                 concatenate=lambda a, b: a + b,
+                 boxing=lambda x: [x]):
         self.comparator = comparator
         self.concatenate = concatenate
-
-    def lcs(self, conflict):
-        """
-        Returns the longuest-common-subsequence between each parts of a conflict
-        """
-        b = conflict.base
-        l = conflict.local
-        r = conflict.remote
-        return lcs(b, l, r)
+        self.boxing = boxing
 
     def lcs(self, b, l, r):
         """
@@ -38,7 +33,7 @@ class LCSAnalyser:
         if (i >= 0) and (j >= 0) and (k >= 0):
             if (self.comparator(b[i], l[j]) and self.comparator(l[j], r[k])):
                 return self.__cached_lcs(b, i - 1, l, j - 1, r, k - 1,
-                                         size) + [Subsequence(b[i], i, j, k)]
+                                         size) + [Subsequence(self.boxing(b[i]), i, j, k)]
             else:
                 tmp_b = self.__cached_lcs(b, i - 1, l, j, r, k, size)
                 tmp_l = self.__cached_lcs(b, i, l, j - 1, r, k, size)

@@ -9,7 +9,7 @@ class LCSTest(unittest.TestCase):
     def test_empty(self):
         """Tests LCS for 3 empty strings"""
         # Given strings to compare
-        a = LCSAnalyser()
+        a = LCSAnalyser(boxing=lambda s: str(s))
         b = ""
         l = ""
         r = ""
@@ -23,7 +23,7 @@ class LCSTest(unittest.TestCase):
     def test_simple(self):
         """Tests LCS for 3 simple strings"""
         # Given strings to compare
-        a = LCSAnalyser()
+        a = LCSAnalyser(boxing=lambda s: str(s))
         b = "text"
         l = "fest"
         r = "melt"
@@ -36,9 +36,9 @@ class LCSTest(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_medium(self):
-        """Tests LCS for 3 simple strings"""
+        """Tests LCS for 3 medium strings"""
         # Given strings to compare
-        a = LCSAnalyser()
+        a = LCSAnalyser(boxing=lambda s: str(s))
         b = "Hell, this is a bad one !"
         l = "He called-on me."
         r = "Hey Bill, cook !"
@@ -54,9 +54,9 @@ class LCSTest(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_custom_comparator(self):
-        """Tests LCS for 3 simple strings"""
+        """Tests LCS for 3 simple strings with custom comparator"""
         # Given strings to compare
-        a = LCSAnalyser(comparator=lambda a, b: a.lower() == b.lower())
+        a = LCSAnalyser(comparator=lambda a, b: a.lower() == b.lower(), boxing=lambda s: str(s))
         b = "Hell, this is a bad one !"
         l = "He called-on me."
         r = "Hey Li, look out !"
@@ -72,9 +72,10 @@ class LCSTest(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_custom_concat(self):
-        """Tests LCS for 3 simple strings"""
+        """Tests LCS for 3 simple strings with custom concatenator"""
         # Given strings to compare
-        a = LCSAnalyser(concatenate=lambda a, b: a.upper() + ";" + b.upper())
+        a = LCSAnalyser(
+            concatenate=lambda a, b: a.upper() + ";" + b.upper(), boxing=lambda s: str(s))
         b = "contestant"
         l = "rightest"
         r = "testing"
