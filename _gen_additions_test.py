@@ -17,7 +17,7 @@ class SolverTest(unittest.TestCase):
 
         # Then check the conflict is resolved
         self.assertTrue(conflict.is_resolved())
-        self.assertEqual(conflict.resolution, "foo\nbaz\n")
+        self.assertEqual(conflict.content, "foo\nbaz\n")
 
     def test_remote_first(self):
         """Test a conflict with additions"""
@@ -29,7 +29,7 @@ class SolverTest(unittest.TestCase):
 
         # Then check the conflict is resolved
         self.assertTrue(conflict.is_resolved())
-        self.assertEqual(conflict.resolution, "baz\nfoo\n")
+        self.assertEqual(conflict.content, "baz\nfoo\n")
 
     def test_not_addition(self):
         """Test an unsolvable conflict"""
@@ -41,11 +41,11 @@ class SolverTest(unittest.TestCase):
 
         # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
+        self.assertFalse(conflict.is_rewritten())
 
 
 def fake_conflict(local, base, remote):
-    return Conflict(local, base, remote,
-                    "<<<<<<<\n" + local + "|||||||\n" + base + "=======\n" + remote + ">>>>>>>\n")
+    return Conflict(local, base, remote, "<<<<<<<\n", ">>>>>>>\n")
 
 
 if __name__ == '__main__':

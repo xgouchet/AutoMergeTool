@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from lcs import *
+from amtlcs import *
 
 
 class LCSTest(unittest.TestCase):
@@ -85,6 +85,25 @@ class LCSTest(unittest.TestCase):
         # Then
         expected = [Subsequence("T;E;S;T", 3, 4, 0)]
         self.assertEqual(result, expected)
+
+    def test_reorder(self):
+        """Tests LCS for 3 simple strings, checking different order (commutativity)"""
+        # Given strings to compare
+        a = LCSAnalyser()
+        b = "acegikmoqsuwy"
+        l = "abdeghjkmnpqstvwyz"
+        r = "bcdfghjklnoprstvwx"
+
+        # When computing lcs
+        extract = lambda x: x.content
+        result = list(map(extract, a.lcs(b, l, r)))
+
+        # Then
+        self.assertEqual(result, list(map(extract, a.lcs(b, r, l))))
+        self.assertEqual(result, list(map(extract, a.lcs(l, b, r))))
+        self.assertEqual(result, list(map(extract, a.lcs(l, r, b))))
+        self.assertEqual(result, list(map(extract, a.lcs(r, b, l))))
+        self.assertEqual(result, list(map(extract, a.lcs(r, l, b))))
 
 
 if __name__ == '__main__':

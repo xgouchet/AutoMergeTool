@@ -21,18 +21,28 @@ class Conflict:
     versions
     """
 
-    def __init__(self, local, base, remote, raw):
+    def __init__(self, local, base, remote, marker_local, marker_remote):
         self.local = local
         self.base = base
         self.remote = remote
-        self.raw = raw
-        self.resolution = None
+        self.marker_local = marker_local
+        self.marker_remote = marker_remote
+        self.raw = marker_local + local + CONFLICT_BASE + "\n" + base + CONFLICT_SEP + "\n" + remote + marker_remote
+        self.content = None
+        self.resolved = False
 
     def resolve(self, resolution):
-        self.resolution = resolution
+        self.content = resolution
+        self.resolved = True
+
+    def rewrite(self, content):
+        self.content = content
+
+    def is_rewritten(self):
+        return self.content != None
 
     def is_resolved(self):
-        return self.resolution != None
+        return self.resolved
 
 
 class ConflictsWalker:
@@ -66,6 +76,7 @@ class ConflictsWalker:
         eof = False
         raw_conflict = ""
         sections = ["", "", ""]
+        markers = ["", ""]
         section_index = 0
         sections_filled = 0
         while (not eof) and (not (conflict_started and conflict_ended)):
@@ -79,9 +90,11 @@ class ConflictsWalker:
                     raise RuntimeError("Conflict is missing the base content. Try running : \n"
                                        "$ git config --global merge.conflictstyle diff3")
                 raw_conflict += line
+                markers[1] = line
                 conflict_ended = True
             elif line.startswith(CONFLICT_START):
                 conflict_started = True
+                markers[0] = line
                 raw_conflict += line
                 section_index = 0
                 sections_filled += 1
@@ -106,7 +119,7 @@ class ConflictsWalker:
         if (eof):
             return False
         else:
-            self.conflict = Conflict(sections[0], sections[1], sections[2], raw_conflict)
+            self.conflict = Conflict(sections[0], sections[1], sections[2], markers[0], markers[1])
             return True
 
     def next_conflict(self):
@@ -138,10 +151,11 @@ class ConflictsWalker:
         Writes the last conflict to the merged file (either the resolution or the original conflict)
         """
         if self.conflict != None:
-            if self.conflict.is_resolved():
-                self.merged_file.write(self.conflict.resolution)
+            if self.conflict.is_rewritten():
+                self.merged_file.write(self.conflict.content)
             else:
                 self.merged_file.write(self.conflict.raw)
+            if not self.conflict.resolved:
                 self.has_remaining_conflicts = True
 
     def write_previous_conflict_report(self):
@@ -150,12 +164,12 @@ class ConflictsWalker:
         """
         if self.report_file and self.report_type != REPORT_NONE:
             if self.conflict != None:
-                if self.conflict.is_resolved():
+                if self.conflict.resolved:
                     if (self.report_type == REPORT_SOLVED) or (self.report_type == REPORT_FULL):
                         self.report_file.write("\n*******  CONFLICT  *******\n")
                         self.report_file.write(self.conflict.raw)
                         self.report_file.write("\nv v v v RESOLUTION v v v v\n")
-                        self.report_file.write(self.conflict.resolution)
+                        self.report_file.write(self.conflict.content)
                 elif (self.report_type == REPORT_UNSOLVED) or (self.report_type == REPORT_FULL):
                     self.report_file.write("\n××××××× UNRESOLVED ×××××××\n")
                     self.report_file.write(self.conflict.raw)

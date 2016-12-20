@@ -28,6 +28,7 @@ KNOWN_PATHS = {
     'java_imports': CURRENT_DIR + '/java_imports.py',
     'gen_additions': CURRENT_DIR + '/gen_additions.py',
     'gen_debug': CURRENT_DIR + '/gen_debug.py',
+    'gen_simplify': CURRENT_DIR + '/gen_simplify.py',
     'gen_woven': CURRENT_DIR + '/gen_woven.py'
 }
 # TODO based on git's internal mergetool code, create defaults for known tools
@@ -37,9 +38,16 @@ KNOWN_CMDS = {
     'java_imports': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
     'gen_additions': '{0} -m $MERGED',
     'gen_debug': '{0} -m $MERGED',
+    'gen_simplify': '{0} -m $MERGED',
     'gen_woven': '{0} -m $MERGED'
 }
-KNOWN_TRUSTS = {'java_imports': True, 'gen_additions': True, 'gen_woven': True}
+KNOWN_TRUSTS = {
+    'java_imports': True,
+    'gen_additions': True,
+    'gen_woven': True,
+    'gen_debug': True,
+    'gen_simplify': True
+}
 KNOWN_EXTENSIONS = {'java_imports': 'java'}
 
 

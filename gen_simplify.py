@@ -4,6 +4,7 @@
 import sys
 import argparse
 from amtutils import *
+from amtlcs import *
 
 
 def parse_arguments():
@@ -23,18 +24,61 @@ def parse_arguments():
 
 def handle_conflict(conflict):
     """Handles a conflict which can be simplified"""
+
     # Here we look at space resistant substrings (eg : "ab cd" is equal to "ab      cd")
-    # TODO 1 : get  the  LCS between B, L and M
-    # TODO 2 : split conflicts
+    lines_local = conflict.local.split('\n')[:-1]
+    lines_base = conflict.base.split('\n')[:-1]
+    lines_remote = conflict.remote.split('\n')[:-1]
 
-    print("The base side of the conflict was :\n" + conflict.base)
-    print("The local side of the conflict is :\n" + conflict.local)
-    print("The remote side of the conflict is :\n" + conflict.remote)
+    # find common lines
+    analyser = LCSAnalyser(concatenate=lambda a, b: list(a) + list(b))
+    result = analyser.lcs(l=lines_local, b=lines_base, r=lines_remote)
 
-    # Here's where you'd try to handle the conflict.
-    # If it's possible to fix the conflict, call `conflict.resolve(resolution)`
-    # Where resolution is the conflict's resolution, as it should appear in the final file
-    # If you can't (or don't want to) resolve the conflict, leave the conflict as is
+    if len(result) == 0:
+        return
+
+    # split conflicts
+    ib = il = ir = 0
+    resolution = ""
+    for sub in result:
+        if (sub.pos_b > ib) or (sub.pos_l > il) or (sub.pos_r > ir):
+            # write conflict before subsequence
+            resolution += conflict.marker_local
+            for line in lines_local[il:sub.pos_l]:
+                resolution += line + "\n"
+            resolution += CONFLICT_BASE + "\n"
+            for line in lines_base[ib:sub.pos_b]:
+                resolution += line + "\n"
+            resolution += CONFLICT_SEP + "\n"
+            for line in lines_remote[ir:sub.pos_r]:
+                resolution += line + "\n"
+            resolution += conflict.marker_remote
+        # write subsequence
+        if isinstance(sub.content, str):
+            size = 1
+            resolution += sub.content + "\n"
+        else:
+            size = len(list(sub.content))
+            for line in list(sub.content):
+                resolution += line + "\n"
+
+        ib = sub.pos_b + size
+        il = sub.pos_l + size
+        ir = sub.pos_r + size
+
+    if (ib < len(lines_base)) or (il < len(lines_local)) or (ir < len(lines_remote)):
+        resolution += conflict.marker_local
+        for line in lines_local[il:]:
+            resolution += line + "\n"
+        resolution += CONFLICT_BASE + "\n"
+        for line in lines_base[ib:]:
+            resolution += line + "\n"
+        resolution += CONFLICT_SEP + "\n"
+        for line in lines_remote[ir:]:
+            resolution += line + "\n"
+        resolution += conflict.marker_remote
+
+    conflict.rewrite(resolution)
 
 
 if __name__ == '__main__':

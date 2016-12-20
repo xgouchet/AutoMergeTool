@@ -17,7 +17,7 @@ class SolverTest(unittest.TestCase):
 
         # Then check the conflict is resolved
         self.assertTrue(conflict.is_resolved())
-        self.assertEqual(conflict.resolution, "fool\nbaz\negg\n")
+        self.assertEqual(conflict.content, "fool\nbaz\negg\n")
 
     def test_not_woven_1(self):
         """Test a conflict with woven changes + additions"""
@@ -27,8 +27,9 @@ class SolverTest(unittest.TestCase):
         # When handling the conflict
         handle_conflict(conflict)
 
-        # Then check the conflict is resolved
+        # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
+        self.assertFalse(conflict.is_rewritten())
 
     def test_not_woven_2(self):
         """Test a conflict with woven changes + additions"""
@@ -38,8 +39,9 @@ class SolverTest(unittest.TestCase):
         # When handling the conflict
         handle_conflict(conflict)
 
-        # Then check the conflict is resolved
+        # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
+        self.assertFalse(conflict.is_rewritten())
 
     def test_not_woven_3(self):
         """Test a conflict with woven changes + deletions"""
@@ -49,8 +51,9 @@ class SolverTest(unittest.TestCase):
         # When handling the conflict
         handle_conflict(conflict)
 
-        # Then check the conflict is resolved
+        # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
+        self.assertFalse(conflict.is_rewritten())
 
     def test_not_woven_4(self):
         """Test a conflict with woven changes + deletions"""
@@ -60,8 +63,9 @@ class SolverTest(unittest.TestCase):
         # When handling the conflict
         handle_conflict(conflict)
 
-        # Then check the conflict is resolved
+        # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
+        self.assertFalse(conflict.is_rewritten())
 
     def test_not_woven_5(self):
         """Test a conflict with real conflicts"""
@@ -71,13 +75,13 @@ class SolverTest(unittest.TestCase):
         # When handling the conflict
         handle_conflict(conflict)
 
-        # Then check the conflict is resolved
+        # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
+        self.assertFalse(conflict.is_rewritten())
 
 
 def fake_conflict(local, base, remote):
-    return Conflict(local, base, remote,
-                    "<<<<<<<\n" + local + "|||||||\n" + base + "=======\n" + remote + ">>>>>>>\n")
+    return Conflict(local, base, remote, "<<<<<<<\n", ">>>>>>>\n")
 
 
 if __name__ == '__main__':
