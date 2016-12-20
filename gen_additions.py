@@ -35,7 +35,16 @@ def handle_conflict(conflict, order):
     """Handle a conflicts where the base is empty"""
     if (conflict.base != ""):
         return
-    use_order = order
+    use_order = order()
+
+    if use_order == ORDER_REMOTE_FIRST:
+        conflict.resolve(conflict.remote + conflict.local)
+    elif use_order == ORDER_LOCAL_FIRST:
+        conflict.resolve(conflict.local + conflict.remote)
+
+
+def __get_order(choice):
+    use_order = choice
     while use_order == ORDER_ASK:
         print("Addition conflict found. Which one should we use first ?\n")
         print("<<<<<<< LOCAL")
@@ -50,17 +59,13 @@ def handle_conflict(conflict, order):
             use_order = ORDER_REMOTE_FIRST
         elif choice == '2':
             use_order = ORDER_LOCAL_FIRST
-
-    if use_order == ORDER_REMOTE_FIRST:
-        conflict.resolve(conflict.remote + conflict.local)
-    elif use_order == ORDER_LOCAL_FIRST:
-        conflict.resolve(conflict.local + conflict.remote)
+    return use_order
 
 
 if __name__ == '__main__':
     args = parse_arguments()
     walker = ConflictsWalker(args.merged, 'mac', args.report)
     while walker.has_more_conflicts():
-        handle_conflict(walker.next_conflict(), args.order)
+        handle_conflict(walker.next_conflict(), lambda: __get_order(args.order))
     walker.end()
     sys.exit(walker.get_merge_status())
