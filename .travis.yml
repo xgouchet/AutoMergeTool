@@ -8,6 +8,6 @@ install:
   - travis_retry pip install -r requirements.txt
   - travis_retry pip install codecov
 script:
-  - nose2 --with-coverage
+  - coverage run -m nose2.__main__ && coverage report
 after_success:
   - codecov

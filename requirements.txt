@@ -1,5 +1,6 @@
 # for unit tests
 coverage
 nose2
+cov-core
 nose-cov
 

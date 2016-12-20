@@ -34,9 +34,11 @@ def handle_conflict(conflict):
     resolution = ""
     for l in range(lines_count):
         if lines_local[l] == lines_base[l]:
-            resolution += lines_remote[l] + '\n'
+            if lines_remote[l] != "":
+                resolution += lines_remote[l] + '\n'
         elif lines_remote[l] == lines_base[l]:
-            resolution += lines_local[l] + '\n'
+            if lines_local[l] != "":
+                resolution += lines_local[l] + '\n'
         else:
             # neither match, harder conflict, return early
             return
