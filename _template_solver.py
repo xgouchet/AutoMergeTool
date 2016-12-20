@@ -23,10 +23,10 @@ def parse_arguments():
 
 def handle_conflict(conflict):
     """Handle a conflicts where the changes are woven"""
-    print("The base side of the conflict was :\n" + conflict.base)
-    print("The local side of the conflict is :\n" + conflict.local)
-    print("The remote side of the conflict is :\n" + conflict.remote)
-
+    # get each side's content
+    base = conflict.base
+    local = conflict.local
+    remote = conflict.remote
     # Here's where you'd try to handle the conflict.
     # If it's possible to fix the conflict, call `conflict.resolve(resolution)`
     # Where resolution is the conflict's resolution, as it should appear in the final file

@@ -1,0 +1,5 @@
+# for unit tests
+coverage
+nose2
+nose-cov
+
