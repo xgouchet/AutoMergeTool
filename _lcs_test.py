@@ -4,47 +4,86 @@
 import unittest
 from lcs import *
 
-class LCSTest(unittest.TestCase):
 
+class LCSTest(unittest.TestCase):
     def test_empty(self):
         """Tests LCS for 3 empty strings"""
         # Given strings to compare
+        a = LCSAnalyser()
         b = ""
         l = ""
         r = ""
 
         # When computing lcs
-        result = lcs(b, l, r)
+        result = a.lcs(b, l, r)
 
         # Then
-        #self.assertEquals(result, "")
+        self.assertEqual(result, [])
 
     def test_simple(self):
         """Tests LCS for 3 simple strings"""
         # Given strings to compare
+        a = LCSAnalyser()
         b = "text"
         l = "fest"
         r = "melt"
 
         # When computing lcs
-        result = lcs(b, l, r)
+        result = a.lcs(b, l, r)
 
         # Then
         expected = [Subsequence("e", 1, 1, 1), Subsequence("t", 3, 3, 3)]
         self.assertEqual(result, expected)
 
-    def test_simple(self):
+    def test_medium(self):
         """Tests LCS for 3 simple strings"""
         # Given strings to compare
+        a = LCSAnalyser()
         b = "Hell, this is a bad one !"
         l = "He called-on me."
-        r = "Hey Bill, look out !"
+        r = "Hey Bill, cook !"
 
         # When computing lcs
-        result = lcs(b, l, r)
+        result = a.lcs(b, l, r)
 
         # Then
-        expected = [Subsequence("He", 0, 0, 0), Subsequence("ll", 2, 5, 6), Subsequence("o", 20,10,11), Subsequence(" ", 23,12,14)]
+        expected = [
+            Subsequence("He", 0, 0, 0), Subsequence("ll", 2, 5, 6), Subsequence("o", 20, 10, 12),
+            Subsequence(" ", 23, 12, 14)
+        ]
+        self.assertEqual(result, expected)
+
+    def test_custom_comparator(self):
+        """Tests LCS for 3 simple strings"""
+        # Given strings to compare
+        a = LCSAnalyser(comparator=lambda a, b: a.lower() == b.lower())
+        b = "Hell, this is a bad one !"
+        l = "He called-on me."
+        r = "Hey Li, look out !"
+
+        # When computing lcs
+        result = a.lcs(b, l, r)
+
+        # Then
+        expected = [
+            Subsequence("He", 0, 0, 0), Subsequence("l", 2, 5, 4), Subsequence("l", 3, 6, 8),
+            Subsequence("o", 20, 10, 13), Subsequence(" ", 23, 12, 16)
+        ]
+        self.assertEqual(result, expected)
+
+    def test_custom_concat(self):
+        """Tests LCS for 3 simple strings"""
+        # Given strings to compare
+        a = LCSAnalyser(concatenate=lambda a, b: a.upper() + ";" + b.upper())
+        b = "contestant"
+        l = "rightest"
+        r = "testing"
+
+        # When computing lcs
+        result = a.lcs(b, l, r)
+
+        # Then
+        expected = [Subsequence("T;E;S;T", 3, 4, 0)]
         self.assertEqual(result, expected)
 
 

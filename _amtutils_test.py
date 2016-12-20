@@ -193,6 +193,5 @@ class ConflictTest(unittest.TestCase):
         os.remove(walker.merged)
 
 
-
 if __name__ == '__main__':
     unittest.main()
