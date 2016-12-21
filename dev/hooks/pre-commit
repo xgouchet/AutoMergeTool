@@ -2,4 +2,4 @@
 yapf -i -r --style='{based_on_style:pep8, COLUMN_LIMIT=100}' .
 
 # run tests
-nose2 --with-cov
+coverage run -m nose2.__main__ && coverage report && coverage html

@@ -52,6 +52,19 @@ class SolverTest(unittest.TestCase):
                          "<<<<<<<\n|||||||\n=======\n8\n9\n>>>>>>>\n" + "f\n" +
                          "<<<<<<<\nx\n|||||||\n=======\n>>>>>>>\n")
 
+    def test_simplify_split_deletions(self):
+        """Test a conflict which can be split in n"""
+        # Given a conflict
+        conflict = fake_conflict("a\nb\n", "a\nb\nc\n", "b\nc\n")
+
+        # When handling the conflict
+        handle_conflict(conflict)
+
+        # Then check the conflict is resolved
+        self.assertFalse(conflict.is_resolved())
+        self.assertEqual(conflict.content, "<<<<<<<\na\n|||||||\na\n=======\n>>>>>>>\n" + "b\n" +
+                         "<<<<<<<\n|||||||\nc\n=======\nc\n>>>>>>>\n")
+
     def test_cant_simplify(self):
         """Test a conflict which can be shrunk"""
         # Given a conflict

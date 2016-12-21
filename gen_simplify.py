@@ -55,13 +55,9 @@ def handle_conflict(conflict):
             resolution += conflict.marker_remote
 
         # write subsequence
-        if isinstance(sub.content, str):
-            size = 1
-            resolution += sub.content
-        else:
-            size = len(list(sub.content))
-            for line in list(sub.content):
-                resolution += line
+        size = len(list(sub.content))
+        for line in list(sub.content):
+            resolution += line
 
         # increment indices
         ib = sub.pos_b + size
