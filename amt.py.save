@@ -13,7 +13,6 @@ GLOBAL_CONFIG = os.path.expanduser('~/.amtconfig')
 
 SECT_AMT = 'amt'
 OPT_TOOLS = 'tools'
-OPT_VERBOSE = 'verbose'
 OPT_KEEP_REPORTS = 'keepReport'
 
 SECT_TOOL_FORMAT = 'mergetool "{0}"'
@@ -50,13 +49,6 @@ KNOWN_TRUSTS = {
     'gen_simplify': True
 }
 KNOWN_EXTENSIONS = {'java_imports': 'java'}
-
-SUCCESSFUL_MERGE = 0
-ERROR_NO_TOOL = 1
-ERROR_EXTENSION = 2
-ERROR_UNKNOWN = 3
-ERROR_CONFLICTS = 4
-ERROR_UNTRUSTED = 5
 
 
 def parse_arguments():
@@ -100,7 +92,7 @@ def get_tool_trust(tool, config):
     """
     section = tool_section_name(tool)
     if config.has_option(section, OPT_TRUST_EXIT_CODE):
-        return config.getboolean(section, OPT_TRUST_EXIT_CODE)
+        return config.get(section, OPT_TRUST_EXIT_CODE)
 
     # Known tools path
     if tool in KNOWN_TRUSTS:
@@ -193,61 +185,7 @@ def expand_arguments(cmd, args):
     return cmd
 
 
-def merge_with_tool(tool, config, args, invocator):
-    """
-    Run the given merge tool with the config and args
-    """
-    verbose = False
-    if (config.has_option(SECT_AMT, OPT_VERBOSE)):
-        verbose = config.getboolean(SECT_AMT, OPT_VERBOSE)
-
-    # check empty tool
-    if (tool == None) or (tool == ""):
-        if verbose:
-            print(" [AMT] ø Ignoring empty tool")
-        return ERROR_NO_TOOL
-
-    # check file extension against tool preset / config
-    extensions = get_tool_extensions(tool, config)
-    if extensions:
-        file_name, file_ext = os.path.splitext(args.merged)
-        file_ext = file_ext[1:]
-        if file_ext not in extensions:
-            if verbose:
-                print(" [AMT] — Ignoring tool {0} (bad extension : {1})".format(tool, file_ext))
-            return ERROR_EXTENSION
-
-    # prepare the command line invocation
-    print(" [AMT] → Trying merge with {0}".format(tool))
-    cmd = get_tool_cmd(tool, config)
-    if cmd == None:
-        if verbose:
-            print(" [AMT] — Ignoring tool {0} (unknown tool)".format(tool))
-        return ERROR_UNKNOWN
-
-    # Run command
-    cmd = expand_arguments(cmd, args)
-    result = invocator(cmd)
-
-    # Check result
-    trust_exit_code = get_tool_trust(tool, config)
-    if trust_exit_code:
-        if (result == 0):
-            if verbose:
-                print(" [AMT] ✓ {0} merged successfully".format(tool))
-            return 0
-        else:
-            if verbose:
-                print(" [AMT] ✗ {0} didn't solve all conflicts".format(tool))
-            return ERROR_CONFLICTS
-    else:
-        # TODO analyse the merged file and look for conflicts ?
-        if verbose:
-            print(" [AMT] ? {0} returned, but this should not be trusted".format(tool))
-        return ERROR_UNTRUSTED
-
-
-def merge(config, args, invocator):
+def merge(config, args):
     """
     Handle the mergetools chain for the given argument
     config -- the current amt configuration
@@ -258,9 +196,39 @@ def merge(config, args, invocator):
     tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
     result = 42
     for tool in tools:
-        result = merge_with_tool(tool, config, args, invocator)
-        if (result == 0):
-            return 0
+        if (tool == None) or (tool == ""):
+            continue
+
+        # check file extension against tool preset / config
+        extensions = get_tool_extensions(tool, config)
+        if extensions:
+            file_name, file_ext = os.path.splitext(args.merged)
+            file_ext = file_ext[1:]
+            if file_ext not in extensions:
+                print(" [AMT] — Ignoring tool {0} (bad extension : {1})".format(tool, file_ext))
+                continue
+
+        # prepare the command line invocation
+        print(" [AMT] → Trying merge with {0}".format(tool))
+        cmd = get_tool_cmd(tool, config)
+        if cmd == None:
+            print(" [AMT] — Ignoring tool {0} (unknown tool)".format(tool))
+            continue
+
+        cmd = expand_arguments(cmd, args)
+        result = subprocess.call(cmd.split(), shell=False)
+
+        trust_exit_code = get_tool_trust(tool, config)
+        if trust_exit_code:
+            if (result == 0):
+                print(" [AMT] ✓ {0} merged successfully".format(tool))
+                return 0
+            else:
+                print(" [AMT] ✗ {0} didn't solve all conflicts".format(tool))
+        else:
+            # TODO analyse the merged file and look for conflicts
+            print(" [AMT] ? {0} returned".format(tool))
+
     print(" [AMT] ⚑ Sorry, it seems we can't solve it this time")
     return result
 
@@ -305,8 +273,6 @@ if __name__ == '__main__':
     args = parse_arguments()
     local_config = find_local_config(args.merged)
     config = read_config(local_config)
-    invocator = lambda c: subprocess.call(c.split(), shell=False)
-
     result = merge(config, args)
 
     if result == 0:
