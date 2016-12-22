@@ -9,7 +9,8 @@ import sys
 import configparser
 
 # CONSTANTS
-GLOBAL_CONFIG = os.path.expanduser('~/.amtconfig')
+GLOBAL_CONFIG = os.path.expanduser('~/.gitconfig')
+LOCAL_CONFIG_NAME = 'gitconfig'
 
 SECT_AMT = 'amt'
 OPT_TOOLS = 'tools'
@@ -73,6 +74,25 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def find_local_config(file):
+    """
+    Finds the nearest parent directory where there is a .git folder
+    """
+    parent = os.path.dirname(file)
+    if (parent == file):
+        return None
+
+    git = os.path.join(parent, ".git")
+    if os.path.exists(git):
+        config = os.path.join(git, LOCAL_CONFIG_NAME)
+        if os.path.exists(config):
+            return config
+        else:
+            return None
+    else:
+        return find_local_config(parent)
+
+
 def read_config(config_path):
     """
     Reads the AMT configuration from the given path
@@ -81,6 +101,7 @@ def read_config(config_path):
     config.read_file(open(GLOBAL_CONFIG))
     if config_path:
         config.read(config_path)
+
     return config
 
 
@@ -281,33 +302,14 @@ def clean_reports(merged):
             os.remove(os.path.join(dir_path, file))
 
 
-def find_local_config(file):
-    """
-    Finds the nearest parent directory where there is a .git folder
-    """
-    parent = os.path.dirname(file)
-    if (parent == file):
-        return None
-
-    git = os.path.join(parent, ".git")
-    if os.path.exists(git):
-        config = os.path.join(git, "amtconfig")
-        if os.path.exists(config):
-            return config
-        else:
-            return None
-    else:
-        return find_local_config(parent)
-
-
 if __name__ == '__main__':
-    print("ArachneMergeTool kickin' in !")
+    # print("ArachneMergeTool kickin' in !")
     args = parse_arguments()
     local_config = find_local_config(args.merged)
     config = read_config(local_config)
     invocator = lambda c: subprocess.call(c.split(), shell=False)
 
-    result = merge(config, args)
+    result = merge(config, args, invocator)
 
     if result == 0:
         clean_reports(args.merged)
