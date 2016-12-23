@@ -1,0 +1,40 @@
+
+××××××× UNRESOLVED ×××××××
+<<<<<<< LOCAL
+Aenean leo ligula, porttitor eu, consefaat vitae, eleifend ac, enim. Alifaam lorem ante, dapibus in, viverra fais, feugiat a, tellus. 
+Phasellus viverra nulla ut metus varius laoreet. faisfae rutrum.
+|||||||
+Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. 
+Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum.
+=======
+Aenean leo ligula, porttitor eu, consepoat vitae, eleifend ac, enim. Alipoam lorem ante, dapibus in, viverra pois, feugiat a, tellus. 
+Phasellus viverra nulla ut metus varius laoreet. poispoe rutrum.
+>>>>>>> REMOTE
+
+*******  CONFLICT  *******
+<<<<<<< LOCAL
+Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut 
+libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet 
+|||||||
+Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut 
+libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet 
+nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
+=======
+libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet 
+nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
+>>>>>>> REMOTE
+v v v v RE-WRITTEN v v v v
+<<<<<<< LOCAL
+Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut 
+|||||||
+Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut 
+=======
+>>>>>>> REMOTE
+libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet 
+<<<<<<< LOCAL
+|||||||
+nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
+=======
+nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
+>>>>>>> REMOTE
+Nunc quis interdum nunc. Praesent mollis risus enim, at elementum quam finibus ut.

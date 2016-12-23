@@ -17,13 +17,14 @@ def parse_arguments():
         choices=[REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL],
         default=REPORT_UNSOLVED,
         required=False)
+    parser.add_argument('-v', '--verbose', required=False, action='store_true')
 
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_arguments()
-    walker = ConflictsWalker(args.merged, 'mwc', args.report)
+    walker = ConflictsWalker(args.merged, 'dbg', args.report, args.verbose)
     while walker.has_more_conflicts():
         continue
     walker.end()

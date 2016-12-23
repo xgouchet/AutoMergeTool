@@ -68,7 +68,9 @@ class ConflictsWalker:
     and rewrite the merged file if needed
     """
 
-    def __init__(self, merged, report_name=None, report_type=REPORT_NONE):
+    def __init__(self, merged, report_name=None, report_type=REPORT_NONE, verbose=False):
+        self.verbose = verbose
+        self.log_tag = report_name
         self.conflicted = merged
         self.merged = merged + ".resolving.amt"
         self.conflicted_file = open(self.conflicted)
@@ -85,6 +87,7 @@ class ConflictsWalker:
     def has_more_conflicts(self):
         self.write_previous_conflict()
         self.write_previous_conflict_report()
+        self.log_previous_conflict()
         self.conflict = None
 
         # if has current conflict, write it or the resolution to the merged file
@@ -181,15 +184,40 @@ class ConflictsWalker:
         """
         if self.report_file and self.report_type != REPORT_NONE:
             if self.conflict != None:
-                if self.conflict.resolved:
+                if self.conflict.is_resolved():
                     if (self.report_type == REPORT_SOLVED) or (self.report_type == REPORT_FULL):
                         self.report_file.write("\n*******  CONFLICT  *******\n")
                         self.report_file.write(self.conflict.raw)
                         self.report_file.write("\nv v v v RESOLUTION v v v v\n")
                         self.report_file.write(self.conflict.content)
+
+                elif self.conflict.is_rewritten():
+                    if (self.report_type == REPORT_UNSOLVED) or (self.report_type == REPORT_FULL):
+                        self.report_file.write("\n*******  CONFLICT  *******\n")
+                        self.report_file.write(self.conflict.raw)
+                        self.report_file.write("\nv v v v RE-WRITTEN v v v v\n")
+                        self.report_file.write(self.conflict.content)
+
                 elif (self.report_type == REPORT_UNSOLVED) or (self.report_type == REPORT_FULL):
                     self.report_file.write("\n××××××× UNRESOLVED ×××××××\n")
                     self.report_file.write(self.conflict.raw)
+
+    def log_previous_conflict(self):
+        """
+        Logs the last seen conflict in the standard output
+        """
+        if self.verbose:
+            if self.conflict != None:
+                print(self.conflict.raw)
+
+                if self.conflict.is_resolved():
+                    print("     ✓ [" + self.log_tag + "] Solved")
+                    print(self.conflict.content)
+                elif self.conflict.is_rewritten():
+                    print("     ↔ [" + self.log_tag + "] Rewritten")
+                    print(self.conflict.content)
+                else:
+                    print("     ✗ [" + self.log_tag + "] Unsolved")
 
 
 if __name__ == '__main__':

@@ -27,6 +27,7 @@ def parse_arguments():
         choices=[REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL],
         default=REPORT_NONE,
         required=False)
+    parser.add_argument('-v', '--verbose', required=False, action='store_true')
 
     return parser.parse_args()
 
@@ -64,7 +65,7 @@ def __get_order(choice):
 
 if __name__ == '__main__':
     args = parse_arguments()
-    walker = ConflictsWalker(args.merged, 'mac', args.report)
+    walker = ConflictsWalker(args.merged, 'adds', args.report, args.verbose)
     while walker.has_more_conflicts():
         handle_conflict(walker.next_conflict(), lambda: __get_order(args.order))
     walker.end()

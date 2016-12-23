@@ -2,9 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
-*.so
+*.py_
 
 # Unit test / coverage reports
 htmlcov/
@@ -17,8 +15,7 @@ coverage.xml
 *,cover
 .hypothesis/
 
-# Custom tests
-tmp_merged.*
 
 # shell editor swap files
 *.swp
+*.save
