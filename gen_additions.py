@@ -8,6 +8,7 @@ from amtutils import *
 ORDER_LOCAL_FIRST = "localfirst"
 ORDER_REMOTE_FIRST = "remotefirst"
 ORDER_ASK = "ask"
+ORDER_NONE = ""
 
 
 def parse_arguments():
@@ -36,7 +37,7 @@ def handle_conflict(conflict, order):
     """Handle a conflicts where the base is empty"""
     if (conflict.base != ""):
         return
-    use_order = order()
+    use_order = order(conflict)
 
     if use_order == ORDER_REMOTE_FIRST:
         conflict.resolve(conflict.remote + conflict.local)
@@ -44,18 +45,16 @@ def handle_conflict(conflict, order):
         conflict.resolve(conflict.local + conflict.remote)
 
 
-def __get_order(choice):
+def get_order(conflict, choice, user_input=lambda msg: input(msg)):
     use_order = choice
     while use_order == ORDER_ASK:
-        print("Addition conflict found. Which one should we use first ?\n")
-        print("<<<<<<< LOCAL")
-        print(conflict.local)
-        print(">>>>>>> REMOTE")
-        print(conflict.remote)
-        choice = input(
-            "Select action : [1] Remote First / [2] Local First / [0] Ignore conflict : ")
+        prompt = "Addition conflict found. Which one should we use first ?\n\n"
+        prompt += "<<<<<<< LOCAL\n" + conflict.local
+        prompt += ">>>>>>> REMOTE\n" + conflict.remote
+        prompt += "Select action : [1] Remote First / [2] Local First / [0] Ignore conflict : "
+        choice = user_input(prompt)
         if choice == '0':
-            return
+            use_order = ORDER_NONE
         elif choice == '1':
             use_order = ORDER_REMOTE_FIRST
         elif choice == '2':
@@ -67,6 +66,6 @@ if __name__ == '__main__':
     args = parse_arguments()
     walker = ConflictsWalker(args.merged, 'adds', args.report, args.verbose)
     while walker.has_more_conflicts():
-        handle_conflict(walker.next_conflict(), lambda: __get_order(args.order))
+        handle_conflict(walker.next_conflict(), lambda conflict: get_order(conflict, args.order))
     walker.end()
     sys.exit(walker.get_merge_status())

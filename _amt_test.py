@@ -180,7 +180,7 @@ class AMTTest(unittest.TestCase):
     def test_expand_arguments(self):
         # Given
         args = lambda: None
-        args = self.__create_args()
+        args = create_args()
 
         # When
         cmd = "foo -from $BASE -to $LOCAL $REMOTE -out $MERGED"
@@ -194,7 +194,7 @@ class AMTTest(unittest.TestCase):
         # Given
         tool = None
         cfg = configparser.ConfigParser()
-        args = self.__create_args()
+        args = create_args()
         invocator = Mock(side_effect=Exception('Should not be invoked'))
 
         # When
@@ -209,7 +209,7 @@ class AMTTest(unittest.TestCase):
         cfg = configparser.ConfigParser()
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_EXTENSIONS, 'bacon;spam')
-        args = self.__create_args()
+        args = create_args()
         invocator = Mock(side_effect=Exception('Should not be invoked'))
 
         # When
@@ -224,7 +224,7 @@ class AMTTest(unittest.TestCase):
         cfg = configparser.ConfigParser()
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_EXTENSIONS, 'bacon;ext;spam')
-        args = self.__create_args()
+        args = create_args()
         invocator = Mock(side_effect=Exception('Should not be invoked'))
 
         # When
@@ -240,7 +240,7 @@ class AMTTest(unittest.TestCase):
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_CMD, 'MY_CMD $MERGED')
         cfg.set(FAKE_TOOL_SECTION, OPT_TRUST_EXIT_CODE, 'true')
-        args = self.__create_args()
+        args = create_args()
         invocator = Mock(side_effect=lambda cmd: 0)
 
         # When
@@ -257,7 +257,7 @@ class AMTTest(unittest.TestCase):
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_CMD, 'MY_CMD $MERGED')
         cfg.set(FAKE_TOOL_SECTION, OPT_TRUST_EXIT_CODE, 'true')
-        args = self.__create_args()
+        args = create_args()
         invocator = Mock(side_effect=lambda cmd: 666)
 
         # When
@@ -273,7 +273,7 @@ class AMTTest(unittest.TestCase):
         cfg = configparser.ConfigParser()
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_CMD, 'MY_CMD $MERGED')
-        args = self.__create_args()
+        args = create_args()
         invocator = Mock(side_effect=lambda cmd: 0)
 
         # When
@@ -283,13 +283,81 @@ class AMTTest(unittest.TestCase):
         self.assertEqual(result, ERROR_UNTRUSTED)
         invocator.assert_called_with('MY_CMD ' + args.merged)
 
-    def __create_args(self):
-        args = lambda: None
-        args.local = "/path/to/blu"
-        args.base = "/path/to/plop"
-        args.remote = "/path/to/fds"
-        args.merged = "/path/to/lol.ext"
-        return args
+    def test_merge_with_tools_all_fail(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_TOOLS, 'foo;bar;baz')
+        cfg.add_section('mergetool "foo"')
+        cfg.set('mergetool "foo"', OPT_CMD, 'MY_CMD1 $MERGED')
+        cfg.set('mergetool "foo"', OPT_TRUST_EXIT_CODE, 'true')
+        cfg.add_section('mergetool "bar"')
+        cfg.set('mergetool "bar"', OPT_CMD, 'MY_CMD2 --out $MERGED')
+        cfg.set('mergetool "bar"', OPT_TRUST_EXIT_CODE, 'true')
+        cfg.add_section('mergetool "baz"')
+        cfg.set('mergetool "baz"', OPT_CMD, 'MY_CMD3 $BASE $MERGED')
+        cfg.set('mergetool "baz"', OPT_TRUST_EXIT_CODE, 'true')
+        args = create_args()
+        invocator = Mock(side_effect=lambda cmd: 1)
+
+        # When
+        result = merge(cfg, args, invocator)
+
+        # Then
+        self.assertEqual(result, ERROR_CONFLICTS)
+        calls = [
+            call('MY_CMD1 ' + args.merged), call('MY_CMD2 --out ' + args.merged),
+            call('MY_CMD3 ' + args.base + ' ' + args.merged)
+        ]
+        invocator.assert_has_calls(calls)
+
+    def test_merge_with_tools_first_succeeds(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_TOOLS, 'foo;bar;baz')
+        cfg.add_section('mergetool "foo"')
+        cfg.set('mergetool "foo"', OPT_CMD, 'MY_CMD1 $MERGED')
+        cfg.set('mergetool "foo"', OPT_TRUST_EXIT_CODE, 'true')
+        cfg.add_section('mergetool "bar"')
+        cfg.set('mergetool "bar"', OPT_CMD, 'MY_CMD2 --out $MERGED')
+        cfg.set('mergetool "bar"', OPT_TRUST_EXIT_CODE, 'true')
+        cfg.add_section('mergetool "baz"')
+        cfg.set('mergetool "baz"', OPT_CMD, 'MY_CMD3 $BASE $MERGED')
+        cfg.set('mergetool "baz"', OPT_TRUST_EXIT_CODE, 'true')
+        args = create_args()
+        invocator = Mock(side_effect=lambda cmd: 0)
+
+        # When
+        result = merge(cfg, args, invocator)
+
+        # Then
+        self.assertEqual(result, SUCCESSFUL_MERGE)
+        invocator.assert_called_once_with('MY_CMD1 ' + args.merged)
+
+    def test_merge_not_configured(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
+        args = create_args()
+        invocator = Mock(side_effect=lambda cmd: 1)
+
+        # When
+        with self.assertRaises(RuntimeError):
+            merge(cfg, args, invocator)
+
+        # Then
+        invocator.assert_not_called()
+
+
+def create_args():
+    args = lambda: None
+    args.local = "/path/to/blu"
+    args.base = "/path/to/plop"
+    args.remote = "/path/to/fds"
+    args.merged = "/path/to/lol.ext"
+    return args
 
 
 if __name__ == '__main__':
