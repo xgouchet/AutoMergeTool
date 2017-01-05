@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import inspect
 import os
 import subprocess
 import sys
 import configparser
+from amtlauncher import *
 
 # CONSTANTS
 GLOBAL_CONFIG = os.path.expanduser('~/.gitconfig')
@@ -16,41 +16,6 @@ SECT_AMT = 'amt'
 OPT_TOOLS = 'tools'
 OPT_VERBOSE = 'verbose'
 OPT_KEEP_REPORTS = 'keepReport'
-
-SECT_TOOL_FORMAT = 'mergetool "{0}"'
-OPT_PATH = 'path'
-OPT_CMD = 'cmd'
-OPT_EXTENSIONS = 'extensions'
-OPT_TRUST_EXIT_CODE = 'trustExitCode'
-
-CURRENT_FRAME = inspect.getfile(inspect.currentframe())
-CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
-
-KNOWN_PATHS = {
-    'java_imports': CURRENT_DIR + '/java_imports.py',
-    'gen_additions': CURRENT_DIR + '/gen_additions.py',
-    'gen_debug': CURRENT_DIR + '/gen_debug.py',
-    'gen_simplify': CURRENT_DIR + '/gen_simplify.py',
-    'gen_woven': CURRENT_DIR + '/gen_woven.py'
-}
-# TODO based on git's internal mergetool code, create defaults for known tools
-KNOWN_CMDS = {
-    'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
-    'opendiff': '"{0}" "$LOCAL" "$REMOTE" -ancestor "$BASE" -merge "$MERGED" | cat',
-    'java_imports': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
-    'gen_additions': '{0} -m $MERGED',
-    'gen_debug': '{0} -m $MERGED',
-    'gen_simplify': '{0} -m $MERGED',
-    'gen_woven': '{0} -m $MERGED'
-}
-KNOWN_TRUSTS = {
-    'java_imports': True,
-    'gen_additions': True,
-    'gen_woven': True,
-    'gen_debug': True,
-    'gen_simplify': True
-}
-KNOWN_EXTENSIONS = {'java_imports': 'java'}
 
 SUCCESSFUL_MERGE = 0
 ERROR_NO_TOOL = 1
@@ -105,102 +70,6 @@ def read_config(config_path):
     return config
 
 
-def tool_section_name(tool):
-    """
-    Generates the mergetool section name for the given tool
-    eg : tool_section_name("foo") → [mergetool "foo"]
-    """
-    return SECT_TOOL_FORMAT.format(tool)
-
-
-def get_tool_trust(tool, config):
-    """
-    Check whether we should trust the exit code of the given tool
-    tool -- the name of the tool
-    config -- the current amt configuration
-    """
-    section = tool_section_name(tool)
-    if config.has_option(section, OPT_TRUST_EXIT_CODE):
-        return config.getboolean(section, OPT_TRUST_EXIT_CODE)
-
-    # Known tools path
-    if tool in KNOWN_TRUSTS:
-        return KNOWN_TRUSTS[tool]
-
-    # Default
-    return False
-
-
-def get_tool_extensions(tool, config):
-    """
-    Get the extensions list the given tool can work on
-    tool -- the name of the tool
-    config -- the current amt configuration
-    """
-    extensions = None
-
-    # Known tools extensions
-    if tool in KNOWN_EXTENSIONS:
-        extensions = KNOWN_EXTENSIONS[tool]
-
-    # Override in config
-    section = tool_section_name(tool)
-    if config.has_option(section, OPT_EXTENSIONS):
-        extensions = config.get(section, OPT_EXTENSIONS)
-
-    if extensions:
-        return extensions.split(';')
-    else:
-        return None
-
-
-def get_tool_path(tool, config):
-    """
-    Get the path for the given tool
-    tool -- the name of the tool
-    config -- the current amt configuration
-    """
-    section = tool_section_name(tool)
-    if config.has_option(section, OPT_PATH):
-        return config.get(section, OPT_PATH)
-
-    # Known tools path
-    if tool in KNOWN_PATHS:
-        return KNOWN_PATHS[tool]
-
-    # Default
-    return tool
-
-
-def get_tool_cmd(tool, config):
-    """
-    Get the command line invocation for the givent tool
-    tool -- the name of the tool
-    config -- the current amt configuration
-    """
-    section = tool_section_name(tool)
-    if (config.has_option(section, OPT_CMD)):
-        return config.get(section, OPT_CMD)
-
-    path = get_tool_path(tool, config)
-
-    if tool in KNOWN_CMDS:
-        cmd = KNOWN_CMDS[tool].format(path)
-        if (config.has_section(section)):
-            for option in config.options(section):
-                if (option == OPT_CMD):
-                    pass
-                if (option == OPT_PATH):
-                    pass
-                if (option == OPT_TRUST_EXIT_CODE):
-                    pass
-                cmd += " --{0} {1}".format(option, config.get(section, option))
-        return cmd
-
-    # No Default
-    return None
-
-
 def expand_arguments(cmd, args):
     """
     Expands the named arguments in the command line invocation
@@ -214,7 +83,7 @@ def expand_arguments(cmd, args):
     return cmd
 
 
-def merge_with_tool(tool, config, args, invocator):
+def merge_with_tool(tool, config, args, launcher):
     """
     Run the given merge tool with the config and args
     """
@@ -229,7 +98,7 @@ def merge_with_tool(tool, config, args, invocator):
         return ERROR_NO_TOOL
 
     # check file extension against tool preset / config
-    extensions = get_tool_extensions(tool, config)
+    extensions = launcher.get_tool_extensions(tool)
     if extensions:
         file_name, file_ext = os.path.splitext(args.merged)
         file_ext = file_ext[1:]
@@ -239,8 +108,9 @@ def merge_with_tool(tool, config, args, invocator):
             return ERROR_EXTENSION
 
     # prepare the command line invocation
-    print(" [AMT] → Trying merge with {0}".format(tool))
-    cmd = get_tool_cmd(tool, config)
+    if verbose:
+        print(" [AMT] → Trying merge with {0}".format(tool))
+    cmd = launcher.get_tool_cmd(tool)
     if cmd == None:
         if verbose:
             print(" [AMT] — Ignoring tool {0} (unknown tool)".format(tool))
@@ -248,10 +118,10 @@ def merge_with_tool(tool, config, args, invocator):
 
     # Run command
     cmd = expand_arguments(cmd, args)
-    result = invocator(cmd)
+    result = launcher.invoke(cmd)
 
     # Check result
-    trust_exit_code = get_tool_trust(tool, config)
+    trust_exit_code = launcher.get_tool_trust(tool)
     if trust_exit_code:
         if (result == 0):
             if verbose:
@@ -268,21 +138,26 @@ def merge_with_tool(tool, config, args, invocator):
         return ERROR_UNTRUSTED
 
 
-def merge(config, args, invocator):
+def merge(config, args, launcher):
     """
     Handle the mergetools chain for the given argument
     config -- the current amt configuration
     args -- the arguments with the base, local, remote and merged filenames
+    launcher -- the launcher helper
     """
     if (not (config.has_option(SECT_AMT, OPT_TOOLS))):
         raise RuntimeError('Missing the {0}.{1} configuration'.format(SECT_AMT, OPT_TOOLS))
+
     tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
-    result = 42
+    result = ERROR_NO_TOOL
+
     for tool in tools:
-        result = merge_with_tool(tool, config, args, invocator)
+        result = merge_with_tool(tool, config, args, launcher)
         if (result == 0):
             return 0
+
     print(" [AMT] ⚑ Sorry, it seems we can't solve it this time")
+
     return result
 
 
@@ -307,9 +182,8 @@ if __name__ == '__main__':
     args = parse_arguments()
     local_config = find_local_config(args.merged)
     config = read_config(local_config)
-    invocator = lambda c: subprocess.call(c.split(), shell=False)
-
-    result = merge(config, args, invocator)
+    launcher = ToolsLauncher(config)
+    result = merge(config, args, launcher)
 
     if result == 0:
         clean_reports(args.merged)
