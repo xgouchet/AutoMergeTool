@@ -4,6 +4,7 @@
 import inspect
 import subprocess
 import os
+import sys
 
 SECT_TOOL_FORMAT = 'mergetool "{0}"'
 OPT_PATH = 'path'
@@ -13,6 +14,7 @@ OPT_TRUST_EXIT_CODE = 'trustExitCode'
 
 CURRENT_FRAME = inspect.getfile(inspect.currentframe())
 CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
+CURRENT_INTERPRETER = sys.executable
 
 KNOWN_PATHS = {
     'java_imports': CURRENT_DIR + '/java_imports.py',
@@ -21,16 +23,20 @@ KNOWN_PATHS = {
     'gen_simplify': CURRENT_DIR + '/gen_simplify.py',
     'gen_woven': CURRENT_DIR + '/gen_woven.py'
 }
+
 # TODO based on git's internal mergetool code, create defaults for known tools
 KNOWN_CMDS = {
+    # 3rd party solvers
     'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
     'opendiff': '"{0}" "$LOCAL" "$REMOTE" -ancestor "$BASE" -merge "$MERGED" | cat',
-    'java_imports': '{0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
-    'gen_additions': '{0} -m $MERGED',
-    'gen_debug': '{0} -m $MERGED',
-    'gen_simplify': '{0} -m $MERGED',
-    'gen_woven': '{0} -m $MERGED'
+    # AMT solvers
+    'java_imports': CURRENT_INTERPRETER + ' {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
+    'gen_additions': CURRENT_INTERPRETER + ' {0} -m $MERGED',
+    'gen_debug': CURRENT_INTERPRETER + ' {0} -m $MERGED',
+    'gen_simplify': CURRENT_INTERPRETER + ' {0} -m $MERGED',
+    'gen_woven': CURRENT_INTERPRETER + ' {0} -m $MERGED'
 }
+
 KNOWN_TRUSTS = {
     'java_imports': True,
     'gen_additions': True,
@@ -38,6 +44,7 @@ KNOWN_TRUSTS = {
     'gen_debug': True,
     'gen_simplify': True
 }
+
 KNOWN_EXTENSIONS = {'java_imports': 'java'}
 
 

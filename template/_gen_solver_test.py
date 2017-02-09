@@ -1,9 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import unittest
 
-from _template_solver import *
+from _gen_solver import *
 
 
 class SolverTest(unittest.TestCase):

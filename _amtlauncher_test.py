@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import unittest
@@ -181,12 +181,13 @@ class ToolsLauncherTest(unittest.TestCase):
         # Given
         cfg = configparser.ConfigParser()
         launcher = ToolsLauncher(cfg)
+        interpreter = sys.executable
 
         # When
         cmd = launcher.get_tool_cmd('gen_debug')
 
         # Then
-        self.assertEqual(cmd, KNOWN_PATHS['gen_debug'] + ' -m $MERGED')
+        self.assertEqual(cmd, interpreter + ' ' + KNOWN_PATHS['gen_debug'] + ' -m $MERGED')
 
     def test_get_tool_cmd_known_with_options(self):
         # Given
@@ -194,12 +195,14 @@ class ToolsLauncherTest(unittest.TestCase):
         cfg.add_section('mergetool "gen_debug"')
         cfg.set('mergetool "gen_debug"', 'breakfast', 'bacon')
         launcher = ToolsLauncher(cfg)
+        interpreter = sys.executable
 
         # When
         cmd = launcher.get_tool_cmd('gen_debug')
 
         # Then
-        self.assertEqual(cmd, KNOWN_PATHS['gen_debug'] + ' -m $MERGED --breakfast bacon')
+        self.assertEqual(
+            cmd, interpreter + ' ' + KNOWN_PATHS['gen_debug'] + ' -m $MERGED --breakfast bacon')
 
 
 if __name__ == '__main__':
