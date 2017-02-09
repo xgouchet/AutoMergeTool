@@ -36,16 +36,38 @@ class SolverTest(unittest.TestCase):
         # When handling the conflict
         handle_conflict(conflict, lambda conflict: ORDER_NONE)
 
-        # Then check the conflict is resolved
+        # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
         self.assertFalse(conflict.is_rewritten())
 
     def test_not_addition(self):
         # Given a conflict
-        conflict = fake_conflict("foo\n", " \n", "baz\n")
+        conflict = fake_conflict("foo\n", "spam\n", "baz\n")
 
         # When handling the conflict
         handle_conflict(conflict, lambda conflict: ORDER_REMOTE_FIRST)
+
+        # Then check the conflict is not resolved
+        self.assertFalse(conflict.is_resolved())
+        self.assertFalse(conflict.is_rewritten())
+
+    def test_addition_blank_lines_mean_empty(self):
+        # Given a conflict
+        conflict = fake_conflict("foo\n", " \n\t \n \n\n \n", "baz\n")
+
+        # When handling the conflict
+        handle_conflict(conflict, lambda conflict: ORDER_REMOTE_FIRST, True)
+
+        # Then check the conflict is resolved
+        self.assertTrue(conflict.is_resolved())
+        self.assertEqual(conflict.content, "baz\nfoo\n")
+
+    def test_addition_keep_blank_lines(self):
+        # Given a conflict
+        conflict = fake_conflict("foo\n", " \n\t\n\n \n", "baz\n")
+
+        # When handling the conflict
+        handle_conflict(conflict, lambda conflict: ORDER_REMOTE_FIRST, False)
 
         # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())

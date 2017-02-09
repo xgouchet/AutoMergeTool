@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
+import string
 import argparse
 from amtutils import *
 
@@ -28,15 +28,22 @@ def parse_arguments():
         choices=[REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL],
         default=REPORT_NONE,
         required=False)
+    parser.add_argument('-w', '--whitespace', required=False, action='store_true')
     parser.add_argument('-v', '--verbose', required=False, action='store_true')
 
     return parser.parse_args()
 
 
-def handle_conflict(conflict, order):
+def handle_conflict(conflict, order, space_means_empty=False):
     """Handle a conflicts where the base is empty"""
-    if (conflict.base != ""):
-        return
+
+    if conflict.base != "":
+        if space_means_empty:
+            if not conflict.base.isspace():
+                return
+        else:
+            return
+
     use_order = order(conflict)
 
     if use_order == ORDER_REMOTE_FIRST:
@@ -66,6 +73,7 @@ if __name__ == '__main__':
     args = parse_arguments()
     walker = ConflictsWalker(args.merged, 'adds', args.report, args.verbose)
     while walker.has_more_conflicts():
-        handle_conflict(walker.next_conflict(), lambda conflict: get_order(conflict, args.order))
+        handle_conflict(walker.next_conflict(), lambda conflict: get_order(conflict, args.order),
+                        args.whitespace)
     walker.end()
     sys.exit(walker.get_merge_status())
