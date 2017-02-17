@@ -31,7 +31,14 @@ def handle_conflict(conflict):
     lines_base = conflict.base_lines()
     lines_remote = conflict.remote_lines()
 
-    # find common lines
+    # Prevent recursion limit
+    limit = sys.getrecursionlimit()
+    max_size = max(len(lines_base), len(lines_local), len(lines_remote))
+    # Arbitrary threshold
+    if max_size * 6 > limit:
+        return
+
+        # find common lines
     analyser = LCSAnalyser(concatenate=lambda a, b: list(a) + list(b))
     result = analyser.lcs(l=lines_local, b=lines_base, r=lines_remote)
 

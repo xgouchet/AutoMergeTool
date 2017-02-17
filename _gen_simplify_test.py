@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import random
+import string
 
 from gen_simplify import *
 
@@ -77,9 +79,30 @@ class SolverTest(unittest.TestCase):
         self.assertFalse(conflict.is_resolved())
         self.assertFalse(conflict.is_rewritten())
 
+    def test_stack_overflow(self):
+        """Test a conflict which too many lines"""
+        # Given a conflict
+        sys.setrecursionlimit(500)
+        size = 100
+        conflict = fake_conflict(generateRandom(size), generateRandom(size), generateRandom(size))
+
+        # When handling the conflict
+        handle_conflict(conflict)
+
+        # Then check the conflict is not resolved
+        self.assertFalse(conflict.is_resolved())
+        self.assertFalse(conflict.is_rewritten())
+
 
 def fake_conflict(local, base, remote):
     return Conflict(local, base, remote, "<<<<<<<\n", ">>>>>>>\n")
+
+
+def generateRandom(lines):
+    result = ""
+    for i in range(0, lines, 1):
+        result += random.choice(string.ascii_letters + string.digits) + "\n"
+    return result
 
 
 if __name__ == '__main__':
