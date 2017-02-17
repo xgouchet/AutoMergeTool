@@ -51,6 +51,17 @@ class SolverTest(unittest.TestCase):
         self.assertFalse(conflict.is_resolved())
         self.assertFalse(conflict.is_rewritten())
 
+    def test_not_addition_space_means_blank(self):
+        # Given a conflict
+        conflict = fake_conflict("foo\n", "spam\n", "baz\n")
+
+        # When handling the conflict
+        handle_conflict(conflict, lambda conflict: ORDER_REMOTE_FIRST, True)
+
+        # Then check the conflict is not resolved
+        self.assertFalse(conflict.is_resolved())
+        self.assertFalse(conflict.is_rewritten())
+
     def test_addition_blank_lines_mean_empty(self):
         # Given a conflict
         conflict = fake_conflict("foo\n", " \n\t \n \n\n \n", "baz\n")
@@ -67,7 +78,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", " \n\t\n\n \n", "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda conflict: ORDER_REMOTE_FIRST, False)
+        handle_conflict(conflict, lambda c: ORDER_REMOTE_FIRST, False)
 
         # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())

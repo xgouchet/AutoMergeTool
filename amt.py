@@ -39,12 +39,12 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def find_local_config(file):
+def find_local_config(config_file):
     """
     Finds the nearest parent directory where there is a .git folder
     """
-    parent = os.path.dirname(file)
-    if (parent == file):
+    parent = os.path.dirname(config_file)
+    if parent == config_file:
         return None
 
     git = os.path.join(parent, ".git")

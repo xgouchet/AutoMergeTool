@@ -4,6 +4,7 @@
 import unittest
 from unittest.mock import *
 
+import configparser
 from amt import *
 
 FAKE_TOOL = 'blu'
@@ -28,6 +29,8 @@ class AMTTest(unittest.TestCase):
         # Given
         tool = None
         cfg = configparser.ConfigParser()
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
         launcher = Mock()
 
@@ -42,6 +45,8 @@ class AMTTest(unittest.TestCase):
         # Given
         tool = FAKE_TOOL
         cfg = configparser.ConfigParser()
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
         launcher_args = {'get_tool_extensions.return_value': 'bacon;spam'}
         launcher = Mock(**launcher_args)
@@ -56,6 +61,8 @@ class AMTTest(unittest.TestCase):
         # Given
         tool = FAKE_TOOL
         cfg = configparser.ConfigParser()
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
         launcher_args = {
             'get_tool_extensions.return_value': 'bacon;ext;spam',
@@ -74,6 +81,8 @@ class AMTTest(unittest.TestCase):
         tool = FAKE_TOOL
         cfg = configparser.ConfigParser()
         cfg.add_section(FAKE_TOOL_SECTION)
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
         launcher_args = {
             'get_tool_trust.return_value': True,
@@ -95,6 +104,8 @@ class AMTTest(unittest.TestCase):
         tool = FAKE_TOOL
         cfg = configparser.ConfigParser()
         cfg.add_section(FAKE_TOOL_SECTION)
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
         launcher_args = {
             'get_tool_trust.return_value': True,
@@ -115,6 +126,8 @@ class AMTTest(unittest.TestCase):
         # Given
         tool = FAKE_TOOL
         cfg = configparser.ConfigParser()
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
         launcher_args = {
             'get_tool_trust.return_value': False,
@@ -141,7 +154,7 @@ class AMTTest(unittest.TestCase):
             'get_tool_trust.return_value': True,
             'get_tool_extensions.return_value': None,
             'get_tool_cmd.side_effect':
-            ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
+                ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
             'invoke.return_value': 1
         }
         launcher = Mock(**launcher_args)
@@ -167,7 +180,7 @@ class AMTTest(unittest.TestCase):
             'get_tool_trust.return_value': True,
             'get_tool_extensions.return_value': None,
             'get_tool_cmd.side_effect':
-            ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
+                ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
             'invoke.return_value': 0
         }
         launcher = Mock(**launcher_args)
@@ -207,6 +220,16 @@ class AMTTest(unittest.TestCase):
 
         # Then
         launcher.assert_not_called()
+
+    def test_find_local_config_not_a_git_folder(self):
+        # Given
+        path = '/dev/null'
+
+        # When
+        config = find_local_config(path)
+
+        # Then
+        self.assertEqual(config, None)
 
 
 def create_args():
