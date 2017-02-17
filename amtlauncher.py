@@ -19,6 +19,7 @@ CURRENT_INTERPRETER = sys.executable
 KNOWN_PATHS = {
     'java_imports': CURRENT_DIR + '/java_imports.py',
     'gen_additions': CURRENT_DIR + '/gen_additions.py',
+    'gen_deletions': CURRENT_DIR + '/gen_deletions.py',
     'gen_debug': CURRENT_DIR + '/gen_debug.py',
     'gen_simplify': CURRENT_DIR + '/gen_simplify.py',
     'gen_woven': CURRENT_DIR + '/gen_woven.py'
@@ -32,6 +33,7 @@ KNOWN_CMDS = {
     # AMT solvers
     'java_imports': CURRENT_INTERPRETER + ' {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
     'gen_additions': CURRENT_INTERPRETER + ' {0} -m $MERGED',
+    'gen_deletions': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_debug': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_simplify': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_woven': CURRENT_INTERPRETER + ' {0} -m $MERGED'
