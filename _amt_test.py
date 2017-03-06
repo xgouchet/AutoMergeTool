@@ -154,7 +154,7 @@ class AMTTest(unittest.TestCase):
             'get_tool_trust.return_value': True,
             'get_tool_extensions.return_value': None,
             'get_tool_cmd.side_effect':
-                ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
+            ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
             'invoke.return_value': 1
         }
         launcher = Mock(**launcher_args)
@@ -180,7 +180,7 @@ class AMTTest(unittest.TestCase):
             'get_tool_trust.return_value': True,
             'get_tool_extensions.return_value': None,
             'get_tool_cmd.side_effect':
-                ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
+            ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
             'invoke.return_value': 0
         }
         launcher = Mock(**launcher_args)
