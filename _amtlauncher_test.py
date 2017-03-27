@@ -1,10 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import unittest
 import configparser
-
-from unittest.mock import *
+import unittest
 
 from amtlauncher import *
 
@@ -38,6 +36,7 @@ class ToolsLauncherTest(unittest.TestCase):
     def test_get_tool_trust_from_config_overriden_false(self):
         # Given
         cfg = configparser.ConfigParser()
+        cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_TRUST_EXIT_CODE, 'false')
         launcher = ToolsLauncher(cfg)
@@ -51,6 +50,7 @@ class ToolsLauncherTest(unittest.TestCase):
     def test_get_tool_trust_from_config_overriden_true(self):
         # Given
         cfg = configparser.ConfigParser()
+        cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_TRUST_EXIT_CODE, 'true')
         launcher = ToolsLauncher(cfg)
@@ -64,6 +64,7 @@ class ToolsLauncherTest(unittest.TestCase):
     def test_get_tool_trust_from_config_overriden_not_boolean(self):
         # Given
         cfg = configparser.ConfigParser()
+        cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_TRUST_EXIT_CODE, 'plop')
         launcher = ToolsLauncher(cfg)
@@ -97,6 +98,7 @@ class ToolsLauncherTest(unittest.TestCase):
     def test_get_tool_extensions_override(self):
         # Given
         cfg = configparser.ConfigParser()
+        cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_EXTENSIONS, 'a;b;c')
         launcher = ToolsLauncher(cfg)
@@ -132,6 +134,7 @@ class ToolsLauncherTest(unittest.TestCase):
     def test_get_tool_path_override(self):
         # Given
         cfg = configparser.ConfigParser()
+        cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_PATH, '/path/to/bar')
         launcher = ToolsLauncher(cfg)
@@ -167,6 +170,7 @@ class ToolsLauncherTest(unittest.TestCase):
     def test_get_tool_cmd_overriden(self):
         # Given
         cfg = configparser.ConfigParser()
+        cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_CMD, 'spam')
         launcher = ToolsLauncher(cfg)
@@ -192,6 +196,7 @@ class ToolsLauncherTest(unittest.TestCase):
     def test_get_tool_cmd_known_with_options(self):
         # Given
         cfg = configparser.ConfigParser()
+        cfg.optionxform = str
         cfg.add_section('mergetool "gen_debug"')
         cfg.set('mergetool "gen_debug"', 'breakfast', 'bacon')
         launcher = ToolsLauncher(cfg)

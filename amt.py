@@ -3,9 +3,8 @@
 
 import argparse
 import os
-import subprocess
-import sys
 import configparser
+
 from amtlauncher import *
 
 # CONSTANTS
@@ -63,6 +62,7 @@ def read_config(config_path):
     Reads the AMT configuration from the given path
     """
     config = configparser.RawConfigParser()
+    config.optionxform = str
     config.read_file(open(GLOBAL_CONFIG))
     if config_path:
         config.read(config_path)
