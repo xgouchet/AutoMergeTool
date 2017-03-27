@@ -25,7 +25,6 @@ KNOWN_PATHS = {
     'gen_woven': CURRENT_DIR + '/gen_woven.py'
 }
 
-
 KNOWN_CMDS = {
     # 3rd party solvers (Tested at least once on a Linux Ubuntu Xenial x64)
     'bc': '"{0}" "$LOCAL" "$REMOTE" "$BASE" '
@@ -51,6 +50,18 @@ KNOWN_CMDS = {
               '-R \'Accel.Search: "Ctrl+F"\' '
               '-R \'Accel.SearchForward: "Ctrl+G"\' '
               '--merged-file "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
+    'emerge': '"{0}" '
+              '-f emerge-files-with-ancestor-command '
+              '"$LOCAL" "$REMOTE" "$BASE" '
+              '"$MERGED"',
+
+    # Untested Vim
+    'vimdiff': '"{0]" -f -d -c \'4wincmd w | wincmd J\' "$LOCAL" "$BASE" "$REMOTE" "$MERGED"',
+    'gvimdiff': '"{0]" -f -d -c \'4wincmd w | wincmd J\' "$LOCAL" "$BASE" "$REMOTE" "$MERGED"',
+    'vimdiff2': '"{0]" -f -d -c \'wincmd l\' "$LOCAL" "$MERGED" "$REMOTE"',
+    'gvimdiff2': '"{0]" -f -d -c \'wincmd l\' "$LOCAL" "$MERGED" "$REMOTE"',
+    'vimdiff3': '"{0]" -f -d -c \'hid | hid | hid\' "$LOCAL" "$REMOTE" "$BASE" "$MERGED"',
+    'gvimdiff3': '"{0]" -f -d -c \'hid | hid | hid\' "$LOCAL" "$REMOTE" "$BASE" "$MERGED"',
 
     # Untested 3rd party solvers, Mac / Windows only
     'araxis': '"{0}" -wait -merge -3 -a1 '
@@ -76,15 +87,22 @@ KNOWN_CMDS = {
     'gen_debug': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_simplify': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_woven': CURRENT_INTERPRETER + ' {0} -m $MERGED'
-} # yapf: disable
+}  # yapf: disable
 
 KNOWN_TRUSTS = {
     # 3rd party solvers
     'deltawalker': True,
+    'emerge': True,
     'diffmerge': True,
+    'gvimdiff': True,
+    'gvimdiff2': True,
+    'gvimdiff3': True,
     'kdiff3': True,
     'tkdiff': True,
     'kompare': True,
+    'vimdiff': True,
+    'vimdiff2': True,
+    'vimdiff3': True,
 
     # AMT solvers
     'java_imports': True,
