@@ -25,11 +25,50 @@ KNOWN_PATHS = {
     'gen_woven': CURRENT_DIR + '/gen_woven.py'
 }
 
-# TODO based on git's internal mergetool code, create defaults for known tools
+
 KNOWN_CMDS = {
-    # 3rd party solvers
-    'meld': '{0} --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
+    # 3rd party solvers (Tested at least once on a Linux Ubuntu Xenial x64)
+    'bc': '"{0}" "$LOCAL" "$REMOTE" "$BASE" '
+          '-mergeoutput="$MERGED"',
+    'bc3': '"{0}" "$LOCAL" "$REMOTE" "$BASE" '
+           '-mergeoutput="$MERGED"',
+    'bcompare': '"{0}" "$LOCAL" "$REMOTE" "$BASE" '
+                '-mergeoutput="$MERGED"',
+    'diffmerge': '"{0}" --merge --result="$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
+    'diffuse': '"{0}" "$LOCAL" "$MERGED" "$REMOTE" "$BASE"',
+    'ecmerge': '"{0}" "$BASE" "$LOCAL" "$REMOTE" --default --mode=merge3 --to="$MERGED"',
+    'kdiff3': '"{0}" --auto '
+              '--L1 "$MERGED (Base)"'
+              '--L2 "$MERGED (Local)"'
+              '--L3 "$MERGED (Remote)"'
+              '-o $MERGED $BASE $LOCAL $REMOTE',
+    'kompare': '"{0}" "$LOCAL" "$REMOTE"',
+    'meld': '"{0}" --output "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
+    'p4merge': '"{0}" "$BASE" "$REMOTE" "$LOCAL" "$MERGED"',
+    'tkdiff': '"{0}" -a "$BASE" -o "$MERGED" "$LOCAL" "$REMOTE"',
+    'xxdiff': '"{0}" -X --show-merged-pane '
+              '-R \'Accel.SaveAsMerged: "Ctrl+S"\' '
+              '-R \'Accel.Search: "Ctrl+F"\' '
+              '-R \'Accel.SearchForward: "Ctrl+G"\' '
+              '--merged-file "$MERGED" "$LOCAL" "$BASE" "$REMOTE"',
+
+    # Untested 3rd party solvers, Mac / Windows only
+    'araxis': '"{0}" -wait -merge -3 -a1 '
+              '"$BASE" "$LOCAL" "$REMOTE" "$MERGED"',
+    'deltawalker': '"{0}" "$LOCAL" "$REMOTE" "$BASE" -merged="$MERGED"',
+
+    # Untested 3rd party solvers, Mac only
     'opendiff': '"{0}" "$LOCAL" "$REMOTE" -ancestor "$BASE" -merge "$MERGED" | cat',
+
+    # Untested 3rd party solvers, Windows only
+    'codecompare': '"{0}" -MF="$LOCAL" -TF="$REMOTE" -BF="$BASE" -RF="$MERGED"',
+    'examdiff': '"{0}" -merge "$LOCAL" "$BASE" "$REMOTE" -o:"$MERGED" -nh',
+    'tortoisemerge': '"{0}" '
+                     '-base "$BASE" -mine "$LOCAL" '
+                     '-theirs "$REMOTE" -merged "$MERGED"',
+    'winmerge': '"{0}" -u -e -dl Local -dr Remote '
+                '"$LOCAL" "$REMOTE" "$MERGED"',
+
     # AMT solvers
     'java_imports': CURRENT_INTERPRETER + ' {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
     'gen_additions': CURRENT_INTERPRETER + ' {0} -m $MERGED',
@@ -37,9 +76,17 @@ KNOWN_CMDS = {
     'gen_debug': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_simplify': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_woven': CURRENT_INTERPRETER + ' {0} -m $MERGED'
-}
+} # yapf: disable
 
 KNOWN_TRUSTS = {
+    # 3rd party solvers
+    'deltawalker': True,
+    'diffmerge': True,
+    'kdiff3': True,
+    'tkdiff': True,
+    'kompare': True,
+
+    # AMT solvers
     'java_imports': True,
     'gen_additions': True,
     'gen_woven': True,
