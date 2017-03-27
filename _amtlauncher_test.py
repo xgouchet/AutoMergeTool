@@ -199,6 +199,8 @@ class ToolsLauncherTest(unittest.TestCase):
         cfg.optionxform = str
         cfg.add_section('mergetool "gen_debug"')
         cfg.set('mergetool "gen_debug"', 'breakfast', 'bacon')
+        cfg.set('mergetool "gen_debug"', 'path', '/toto')
+        cfg.set('mergetool "gen_debug"', 'trustExitCode', 'false')
         launcher = ToolsLauncher(cfg)
         interpreter = sys.executable
 
@@ -206,8 +208,69 @@ class ToolsLauncherTest(unittest.TestCase):
         cmd = launcher.get_tool_cmd('gen_debug')
 
         # Then
-        self.assertEqual(
-            cmd, interpreter + ' ' + KNOWN_PATHS['gen_debug'] + ' -m $MERGED --breakfast bacon')
+        self.assertEqual(cmd, interpreter + ' /toto -m $MERGED --breakfast bacon')
+
+    def test_sanitize_command_simple(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        launcher = ToolsLauncher(cfg)
+        cmd = "foo -o /dev/null/base /dev/null/merged"
+
+        # When
+        tokens = launcher.sanitize_command(cmd)
+
+        # Then
+        self.assertEqual(tokens, ['foo', '-o', '/dev/null/base', '/dev/null/merged'])
+
+    def test_sanitize_command_with_whitespaces(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        launcher = ToolsLauncher(cfg)
+        cmd = "foo -o  \n  /dev/null/base \t\t /dev/null/merged"
+
+        # When
+        tokens = launcher.sanitize_command(cmd)
+
+        # Then
+        self.assertEqual(tokens, ['foo', '-o', '/dev/null/base', '/dev/null/merged'])
+
+    def test_sanitize_command_with_quotes(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        launcher = ToolsLauncher(cfg)
+        cmd = "foo -o '/dev/null/base with space' '/dev/null/mergedwith\"e'"
+
+        # When
+        tokens = launcher.sanitize_command(cmd)
+
+        # Then
+        self.assertEqual(tokens,
+                         ['foo', '-o', '/dev/null/base with space', '/dev/null/mergedwith\"e'])
+
+    def test_sanitize_command_with_double_quotes(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        launcher = ToolsLauncher(cfg)
+        cmd = 'foo -o "/dev/null/base with space" "/dev/null/mergedwith\'e"'
+
+        # When
+        tokens = launcher.sanitize_command(cmd)
+
+        # Then
+        self.assertEqual(tokens,
+                         ['foo', '-o', '/dev/null/base with space', '/dev/null/mergedwith\'e'])
+
+    def test_sanitize_command_weird_syntax(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        launcher = ToolsLauncher(cfg)
+        cmd = 'foo -o="/dev/null/base" -p=\'/dev/null/merged\''
+
+        # When
+        tokens = launcher.sanitize_command(cmd)
+
+        # Then
+        self.assertEqual(tokens, ['foo', '-o="/dev/null/base"', '-p=\'/dev/null/merged\''])
 
 
 if __name__ == '__main__':

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import inspect
-import subprocess
 import os
+import subprocess
 import sys
 
 SECT_TOOL_FORMAT = 'mergetool "{0}"'
@@ -124,29 +124,72 @@ class ToolsLauncher:
         config -- the current amt configuration
         """
         section = self.tool_section_name(tool)
-        if (self.config.has_option(section, OPT_CMD)):
+        if self.config.has_option(section, OPT_CMD):
             return self.config.get(section, OPT_CMD)
 
         path = self.get_tool_path(tool)
 
         if tool in KNOWN_CMDS:
             cmd = KNOWN_CMDS[tool].format(path)
-            if (self.config.has_section(section)):
+            if self.config.has_section(section):
                 for option in self.config.options(section):
-                    if (option == OPT_CMD):
+                    if option == OPT_PATH or option == OPT_TRUST_EXIT_CODE:
                         pass
-                    if (option == OPT_PATH):
-                        pass
-                    if (option == OPT_TRUST_EXIT_CODE):
-                        pass
-                    cmd += " --{0} {1}".format(option, self.config.get(section, option))
+                    else:
+                        cmd += " --{0} {1}".format(option, self.config.get(section, option))
             return cmd
 
         # No Default
         return None
 
+    def sanitize_command(self, cmd):
+        """
+        Sanitizes the command into an array of arguments
+        :param cmd:
+        :return:
+        """
+        within_quote = False
+        within_double_quote = False
+        tokens = []
+        accumulator = ""
+        for c in cmd:
+            if c == '"' and not within_quote:
+                if within_double_quote:
+                    if len(accumulator) > 0:
+                        tokens.append(accumulator)
+                        accumulator = ""
+                    within_double_quote = False
+                else:
+                    if len(accumulator) == 0:
+                        within_double_quote = True
+                    else:
+                        accumulator += c
+            elif c == '\'' and not within_double_quote:
+                if within_quote:
+                    if len(accumulator) > 0:
+                        tokens.append(accumulator)
+                        accumulator = ""
+                    within_quote = False
+                else:
+                    if len(accumulator) == 0:
+                        within_quote = True
+                    else:
+                        accumulator += c
+            elif (c == ' ' or c == '\t' or c == '\n') and (not within_double_quote) and (
+                    not within_quote):
+                if len(accumulator) > 0:
+                    tokens.append(accumulator)
+                    accumulator = ""
+            else:
+                accumulator += c
+
+        if len(accumulator) > 0:
+            tokens.append(accumulator)
+        return tokens
+
     def invoke(self, cmd):
         """
         Invokes the given command
         """
-        return subprocess.call(cmd.split(), shell=False)
+        sanitized_cmd = self.sanitize_command(cmd)
+        return subprocess.call(sanitized_cmd, shell=False)

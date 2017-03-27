@@ -22,6 +22,7 @@ ERROR_EXTENSION = 2
 ERROR_UNKNOWN = 3
 ERROR_CONFLICTS = 4
 ERROR_UNTRUSTED = 5
+ERROR_INVOCATION = 6
 
 
 def parse_arguments():
@@ -35,7 +36,15 @@ def parse_arguments():
     parser.add_argument('-r', '--remote', required=True)
     parser.add_argument('-m', '--merged', required=True)
 
-    return parser.parse_args()
+    # convert to absolute path
+    working_dir = os.getcwd()
+    parsed_arg = parser.parse_args()
+
+    parsed_arg.base = os.path.abspath(parsed_arg.base)
+    parsed_arg.local = os.path.abspath(parsed_arg.local)
+    parsed_arg.remote = os.path.abspath(parsed_arg.remote)
+    parsed_arg.merged = os.path.abspath(parsed_arg.merged)
+    return parsed_arg
 
 
 def find_local_config(config_file):
@@ -48,9 +57,9 @@ def find_local_config(config_file):
 
     git = os.path.join(parent, ".git")
     if os.path.exists(git):
-        config = os.path.join(git, LOCAL_CONFIG_NAME)
-        if os.path.exists(config):
-            return config
+        local_config_path = os.path.join(git, LOCAL_CONFIG_NAME)
+        if os.path.exists(local_config_path):
+            return local_config_path
         else:
             return None
     else:
@@ -88,11 +97,11 @@ def merge_with_tool(tool, config, args, launcher):
     Run the given merge tool with the config and args
     """
     verbose = False
-    if (config.has_option(SECT_AMT, OPT_VERBOSE)):
+    if config.has_option(SECT_AMT, OPT_VERBOSE):
         verbose = config.getboolean(SECT_AMT, OPT_VERBOSE)
 
     # check empty tool
-    if (tool == None) or (tool == ""):
+    if (tool is None) or (tool == ""):
         if verbose:
             print(" [AMT] ø Ignoring empty tool")
         return ERROR_NO_TOOL
@@ -111,19 +120,24 @@ def merge_with_tool(tool, config, args, launcher):
     if verbose:
         print(" [AMT] → Trying merge with {0}".format(tool))
     cmd = launcher.get_tool_cmd(tool)
-    if cmd == None:
+    if cmd is None:
         if verbose:
             print(" [AMT] — Ignoring tool {0} (unknown tool)".format(tool))
         return ERROR_UNKNOWN
 
     # Run command
     cmd = expand_arguments(cmd, args)
-    result = launcher.invoke(cmd)
+    try:
+        invocation_result = launcher.invoke(cmd)
+    except Exception as err:
+        invocation_result = ERROR_INVOCATION
+        if verbose:
+            print(" [AMT] ✗ {0} error running command {1}\n $ {2}".format(tool, err, cmd))
 
     # Check result
     trust_exit_code = launcher.get_tool_trust(tool)
-    if trust_exit_code:
-        if (result == 0):
+    if trust_exit_code or invocation_result == ERROR_INVOCATION:
+        if invocation_result == 0:
             if verbose:
                 print(" [AMT] ✓ {0} merged successfully".format(tool))
             return 0
@@ -145,20 +159,20 @@ def merge(config, args, launcher):
     args -- the arguments with the base, local, remote and merged filenames
     launcher -- the launcher helper
     """
-    if (not (config.has_option(SECT_AMT, OPT_TOOLS))):
+    if not (config.has_option(SECT_AMT, OPT_TOOLS)):
         raise RuntimeError('Missing the {0}.{1} configuration'.format(SECT_AMT, OPT_TOOLS))
 
     tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
-    result = ERROR_NO_TOOL
+    merge_result = ERROR_NO_TOOL
 
     for tool in tools:
-        result = merge_with_tool(tool, config, args, launcher)
-        if (result == 0):
+        merge_result = merge_with_tool(tool, config, args, launcher)
+        if merge_result == 0:
             return 0
 
     print(" [AMT] ⚑ Sorry, it seems we can't solve it this time")
 
-    return result
+    return merge_result
 
 
 def clean_reports(merged):
@@ -178,8 +192,8 @@ def clean_reports(merged):
 
 
 if __name__ == '__main__':
-    # print("ArachneMergeTool kickin' in !")
     args = parse_arguments()
+
     local_config = find_local_config(args.merged)
     config = read_config(local_config)
     launcher = ToolsLauncher(config)
