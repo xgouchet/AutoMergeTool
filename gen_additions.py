@@ -1,12 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import string
 import argparse
+
 from amtutils import *
 
 ORDER_LOCAL_FIRST = "localfirst"
+ORDER_LOCAL_ONLY = "localonly"
 ORDER_REMOTE_FIRST = "remotefirst"
+ORDER_REMOTE_ONLY = "remoteonly"
 ORDER_ASK = "ask"
 ORDER_NONE = ""
 
@@ -34,9 +36,15 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def handle_conflict(conflict, order, space_means_empty=False):
+def is_same_addition(local, remote):
+    # TODO allow some margin of error in this check (different whitespace, comments...)
+    return local == remote
+
+
+def handle_conflict(conflict, chose_order, space_means_empty=False):
     """Handle a conflicts where the base is empty"""
 
+    # Check if is addition
     if conflict.base != "":
         if space_means_empty:
             if not conflict.base.isspace():
@@ -44,12 +52,22 @@ def handle_conflict(conflict, order, space_means_empty=False):
         else:
             return
 
-    use_order = order(conflict)
+    # Check if same addition in remote and local
+    if is_same_addition(conflict.local, conflict.remote):
+        conflict.resolve(conflict.local)
+        return
 
-    if use_order == ORDER_REMOTE_FIRST:
+    # get the order
+    order = chose_order(conflict)
+
+    if order == ORDER_REMOTE_FIRST:
         conflict.resolve(conflict.remote + conflict.local)
-    elif use_order == ORDER_LOCAL_FIRST:
+    elif order == ORDER_LOCAL_FIRST:
         conflict.resolve(conflict.local + conflict.remote)
+    elif order == ORDER_REMOTE_ONLY:
+        conflict.resolve(conflict.remote)
+    elif order == ORDER_LOCAL_ONLY:
+        conflict.resolve(conflict.local)
 
 
 def get_order(conflict, choice, user_input=lambda msg: input(msg)):
@@ -58,7 +76,13 @@ def get_order(conflict, choice, user_input=lambda msg: input(msg)):
         prompt = "Addition conflict found. Which one should we use first ?\n\n"
         prompt += "<<<<<<< LOCAL\n" + conflict.local
         prompt += ">>>>>>> REMOTE\n" + conflict.remote
-        prompt += "Select action : [1] Remote First / [2] Local First / [0] Ignore conflict : "
+        prompt += "Select action : \n"
+        prompt += " - [1] Remote First\n"
+        prompt += " - [2] Local First\n"
+        prompt += " - [3] Remote Only\n"
+        prompt += " - [4] Local Only\n"
+        prompt += " - [0] Ignore conflict\n"
+        prompt += "»"
         choice = user_input(prompt)
         if choice == '0':
             use_order = ORDER_NONE
@@ -66,6 +90,10 @@ def get_order(conflict, choice, user_input=lambda msg: input(msg)):
             use_order = ORDER_REMOTE_FIRST
         elif choice == '2':
             use_order = ORDER_LOCAL_FIRST
+        elif choice == '3':
+            use_order = ORDER_REMOTE_ONLY
+        elif choice == '4':
+            use_order = ORDER_LOCAL_ONLY
     return use_order
 
 

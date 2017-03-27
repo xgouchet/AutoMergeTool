@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
 import os
+import sys
 
 CONFLICT_START = "<<<<<<<"
 CONFLICT_BASE = "|||||||"

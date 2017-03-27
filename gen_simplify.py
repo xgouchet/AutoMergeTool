@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
 import argparse
-from amtutils import *
+
 from amtlcs import *
+from amtutils import *
 
 
 def parse_arguments():
@@ -38,7 +38,7 @@ def handle_conflict(conflict):
     if max_size * 6 > limit:
         return
 
-        # find common lines
+    # find common lines
     analyser = LCSAnalyser(concatenate=lambda a, b: list(a) + list(b))
     result = analyser.lcs(l=lines_local, b=lines_base, r=lines_remote)
 
