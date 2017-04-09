@@ -120,6 +120,31 @@ class ToolsLauncherTest(unittest.TestCase):
         # Then
         self.assertEqual(exts, ['java'])
 
+    def test_get_tool_ignored_extensions_none(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        launcher = ToolsLauncher(cfg)
+
+        # When
+        exts = launcher.get_tool_ignored_extensions(FAKE_TOOL)
+
+        # Then
+        self.assertIsNone(exts)
+
+    def test_get_tool_ignored_extensions_override(self):
+        # Given
+        cfg = configparser.ConfigParser()
+        cfg.optionxform = str
+        cfg.add_section(FAKE_TOOL_SECTION)
+        cfg.set(FAKE_TOOL_SECTION, OPT_IGNORED_EXTENSIONS, 'a;b;c')
+        launcher = ToolsLauncher(cfg)
+
+        # When
+        exts = launcher.get_tool_ignored_extensions(FAKE_TOOL)
+
+        # Then
+        self.assertEqual(exts, ['a', 'b', 'c'])
+
     def test_get_tool_path_none(self):
         # Given
         cfg = configparser.ConfigParser()

@@ -108,12 +108,18 @@ def merge_with_tool(tool, config, args, launcher):
 
     # check file extension against tool preset / config
     extensions = launcher.get_tool_extensions(tool)
-    if extensions:
+    ignored_extensions = launcher.get_tool_ignored_extensions(tool)
+    if extensions or ignored_extensions:
         file_name, file_ext = os.path.splitext(args.merged)
         file_ext = file_ext[1:]
-        if file_ext not in extensions:
+        if (extensions is not None) and (file_ext not in extensions):
             if verbose:
                 print(" [AMT] — Ignoring tool {0} (bad extension : {1})".format(tool, file_ext))
+            return ERROR_EXTENSION
+        if (ignored_extensions is not None) and (file_ext in ignored_extensions):
+            if verbose:
+                print(" [AMT] — Ignoring tool {0} (ignoring extension : {1})".format(tool,
+                                                                                     file_ext))
             return ERROR_EXTENSION
 
     # prepare the command line invocation

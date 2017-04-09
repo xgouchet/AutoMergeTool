@@ -57,7 +57,26 @@ class AMTTest(unittest.TestCase):
         # Then
         self.assertEqual(result, ERROR_EXTENSION)
 
-    def test_merge_with_unknoown_tool(self):
+    def test_merge_with_ignored_extensions(self):
+        # Given
+        tool = FAKE_TOOL
+        cfg = configparser.ConfigParser()
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
+        args = create_args()
+        launcher_args = {
+            'get_tool_extensions.return_value': None,
+            'get_tool_ignored_extensions.return_value': 'bacon;spam;ext'
+        }
+        launcher = Mock(**launcher_args)
+
+        # When
+        result = merge_with_tool(tool, cfg, args, launcher)
+
+        # Then
+        self.assertEqual(result, ERROR_EXTENSION)
+
+    def test_merge_with_unknown_tool(self):
         # Given
         tool = FAKE_TOOL
         cfg = configparser.ConfigParser()
@@ -66,6 +85,7 @@ class AMTTest(unittest.TestCase):
         args = create_args()
         launcher_args = {
             'get_tool_extensions.return_value': 'bacon;ext;spam',
+            'get_tool_ignored_extensions.return_value': None,
             'get_tool_cmd.return_value': None
         }
         launcher = Mock(**launcher_args)
@@ -87,6 +107,7 @@ class AMTTest(unittest.TestCase):
         launcher_args = {
             'get_tool_trust.return_value': True,
             'get_tool_extensions.return_value': None,
+            'get_tool_ignored_extensions.return_value': None,
             'get_tool_cmd.return_value': 'MY_CMD $MERGED',
             'invoke.return_value': 0
         }
@@ -110,6 +131,7 @@ class AMTTest(unittest.TestCase):
         launcher_args = {
             'get_tool_trust.return_value': True,
             'get_tool_extensions.return_value': None,
+            'get_tool_ignored_extensions.return_value': None,
             'get_tool_cmd.return_value': 'MY_CMD $MERGED',
             'invoke.return_value': 6
         }
@@ -132,6 +154,7 @@ class AMTTest(unittest.TestCase):
         launcher_args = {
             'get_tool_trust.return_value': False,
             'get_tool_extensions.return_value': None,
+            'get_tool_ignored_extensions.return_value': None,
             'get_tool_cmd.return_value': 'MY_CMD $MERGED',
             'invoke.return_value': 0
         }
@@ -153,6 +176,7 @@ class AMTTest(unittest.TestCase):
         launcher_args = {
             'get_tool_trust.return_value': True,
             'get_tool_extensions.return_value': None,
+            'get_tool_ignored_extensions.return_value': None,
             'get_tool_cmd.side_effect':
             ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
             'invoke.return_value': 1
@@ -179,6 +203,7 @@ class AMTTest(unittest.TestCase):
         launcher_args = {
             'get_tool_trust.return_value': True,
             'get_tool_extensions.return_value': None,
+            'get_tool_ignored_extensions.return_value': None,
             'get_tool_cmd.side_effect':
             ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
             'invoke.return_value': 0

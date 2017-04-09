@@ -10,6 +10,7 @@ SECT_TOOL_FORMAT = 'mergetool "{0}"'
 OPT_PATH = 'path'
 OPT_CMD = 'cmd'
 OPT_EXTENSIONS = 'extensions'
+OPT_IGNORED_EXTENSIONS = 'ignoreExtensions'
 OPT_TRUST_EXIT_CODE = 'trustExitCode'
 
 CURRENT_FRAME = inspect.getfile(inspect.currentframe())
@@ -163,6 +164,23 @@ class ToolsLauncher:
 
         if extensions:
             return extensions.split(';')
+        else:
+            return None
+
+    def get_tool_ignored_extensions(self, tool):
+        """
+        Get the extensions list the given tool can work on
+        tool -- the name of the tool
+        """
+        ignored_extensions = None
+
+        # Check in config
+        section = self.tool_section_name(tool)
+        if self.config.has_option(section, OPT_IGNORED_EXTENSIONS):
+            ignored_extensions = self.config.get(section, OPT_IGNORED_EXTENSIONS)
+
+        if ignored_extensions:
+            return ignored_extensions.split(';')
         else:
             return None
 
