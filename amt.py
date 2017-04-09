@@ -6,6 +6,7 @@ import os
 import configparser
 
 from amtlauncher import *
+from amtanalyser import *
 
 # CONSTANTS
 GLOBAL_CONFIG = os.path.expanduser('~/.gitconfig')
@@ -92,7 +93,7 @@ def expand_arguments(cmd, args):
     return cmd
 
 
-def merge_with_tool(tool, config, args, launcher):
+def merge_with_tool(tool, config, args, launcher, analyser):
     """
     Run the given merge tool with the config and args
     """
@@ -146,19 +147,26 @@ def merge_with_tool(tool, config, args, launcher):
         if invocation_result == 0:
             if verbose:
                 print(" [AMT] ✓ {0} merged successfully".format(tool))
-            return 0
+            return SUCCESSFUL_MERGE
         else:
             if verbose:
                 print(" [AMT] ✗ {0} didn't solve all conflicts".format(tool))
             return ERROR_CONFLICTS
     else:
-        # TODO analyse the merged file and look for conflicts ?
         if verbose:
             print(" [AMT] ? {0} returned, but this should not be trusted".format(tool))
-        return ERROR_UNTRUSTED
+        has_remaining = analyser.has_remaining_conflicts(args.merged)
+        if has_remaining == 0:
+            if verbose:
+                print(" [AMT] ✓ {0} merged successfully".format(tool))
+            return SUCCESSFUL_MERGE
+        else:
+            if verbose:
+                print(" [AMT] ✗ {0} didn't solve all conflicts".format(tool))
+            return ERROR_CONFLICTS
 
 
-def merge(config, args, launcher):
+def merge(config, args, launcher, analyser):
     """
     Handle the mergetools chain for the given argument
     config -- the current amt configuration
@@ -172,7 +180,7 @@ def merge(config, args, launcher):
     merge_result = ERROR_NO_TOOL
 
     for tool in tools:
-        merge_result = merge_with_tool(tool, config, args, launcher)
+        merge_result = merge_with_tool(tool, config, args, launcher, analyser)
         if merge_result == 0:
             return 0
 
@@ -190,7 +198,6 @@ def clean_reports(merged):
             return
     print(" [AMT] * Cleaning up reports")
     abs_path = os.path.abspath(merged)
-    base_name = os.path.basename(merged) + '.'
     dir_path = os.path.dirname(abs_path)
     for file in os.listdir(dir_path):
         if file.startswith(base_name) and file.endswith('-report'):
@@ -203,7 +210,8 @@ if __name__ == '__main__':
     local_config = find_local_config(args.merged)
     config = read_config(local_config)
     launcher = ToolsLauncher(config)
-    result = merge(config, args, launcher)
+    analyser = ConflictedFileAnalyser()
+    result = merge(config, args, launcher, analyser)
 
     if result == 0:
         clean_reports(args.merged)

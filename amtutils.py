@@ -41,7 +41,7 @@ class Conflict:
         self.content = content
 
     def is_rewritten(self):
-        return self.content != None
+        return self.content is not None
 
     def is_resolved(self):
         return self.resolved
@@ -136,7 +136,7 @@ class ConflictsWalker:
                     sections[section_index] += line
                 else:
                     self.merged_file.write(line)
-        if (eof):
+        if eof:
             return False
         else:
             self.conflict = Conflict(sections[0], sections[1], sections[2], markers[0], markers[1])

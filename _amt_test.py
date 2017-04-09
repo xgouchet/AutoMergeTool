@@ -33,9 +33,10 @@ class AMTTest(unittest.TestCase):
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
         launcher = Mock()
+        analyser = Mock()
 
         # When
-        result = merge_with_tool(tool, cfg, args, launcher)
+        result = merge_with_tool(tool, cfg, args, launcher, analyser)
 
         # Then
         self.assertEqual(result, ERROR_NO_TOOL)
@@ -50,9 +51,10 @@ class AMTTest(unittest.TestCase):
         args = create_args()
         launcher_args = {'get_tool_extensions.return_value': 'bacon;spam'}
         launcher = Mock(**launcher_args)
+        analyser = Mock()
 
         # When
-        result = merge_with_tool(tool, cfg, args, launcher)
+        result = merge_with_tool(tool, cfg, args, launcher, analyser)
 
         # Then
         self.assertEqual(result, ERROR_EXTENSION)
@@ -69,9 +71,10 @@ class AMTTest(unittest.TestCase):
             'get_tool_ignored_extensions.return_value': 'bacon;spam;ext'
         }
         launcher = Mock(**launcher_args)
+        analyser = Mock()
 
         # When
-        result = merge_with_tool(tool, cfg, args, launcher)
+        result = merge_with_tool(tool, cfg, args, launcher, analyser)
 
         # Then
         self.assertEqual(result, ERROR_EXTENSION)
@@ -89,9 +92,10 @@ class AMTTest(unittest.TestCase):
             'get_tool_cmd.return_value': None
         }
         launcher = Mock(**launcher_args)
+        analyser = Mock()
 
         # When
-        result = merge_with_tool(tool, cfg, args, launcher)
+        result = merge_with_tool(tool, cfg, args, launcher, analyser)
 
         # Then
         self.assertEqual(result, ERROR_UNKNOWN)
@@ -112,9 +116,10 @@ class AMTTest(unittest.TestCase):
             'invoke.return_value': 0
         }
         launcher = Mock(**launcher_args)
+        analyser = Mock()
 
         # When
-        result = merge_with_tool(tool, cfg, args, launcher)
+        result = merge_with_tool(tool, cfg, args, launcher, analyser)
 
         # Then
         self.assertEqual(result, SUCCESSFUL_MERGE)
@@ -136,15 +141,16 @@ class AMTTest(unittest.TestCase):
             'invoke.return_value': 6
         }
         launcher = Mock(**launcher_args)
+        analyser = Mock()
 
         # When
-        result = merge_with_tool(tool, cfg, args, launcher)
+        result = merge_with_tool(tool, cfg, args, launcher, analyser)
 
         # Then
         self.assertEqual(result, ERROR_CONFLICTS)
         launcher.invoke.assert_called_with('MY_CMD ' + args.merged)
 
-    def test_merge_with_tool_untrusted(self):
+    def test_merge_with_tool_untrusted_solved(self):
         # Given
         tool = FAKE_TOOL
         cfg = configparser.ConfigParser()
@@ -159,12 +165,39 @@ class AMTTest(unittest.TestCase):
             'invoke.return_value': 0
         }
         launcher = Mock(**launcher_args)
+        analyser_args = {'has_remaining_conflicts.return_value': False}
+        analyser = Mock(**analyser_args)
 
         # When
-        result = merge_with_tool(tool, cfg, args, launcher)
+        result = merge_with_tool(tool, cfg, args, launcher, analyser)
 
         # Then
-        self.assertEqual(result, ERROR_UNTRUSTED)
+        self.assertEqual(result, SUCCESSFUL_MERGE)
+        launcher.invoke.assert_called_with('MY_CMD ' + args.merged)
+
+    def test_merge_with_tool_untrusted_unsolved(self):
+        # Given
+        tool = FAKE_TOOL
+        cfg = configparser.ConfigParser()
+        cfg.add_section(SECT_AMT)
+        cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
+        args = create_args()
+        launcher_args = {
+            'get_tool_trust.return_value': False,
+            'get_tool_extensions.return_value': None,
+            'get_tool_ignored_extensions.return_value': None,
+            'get_tool_cmd.return_value': 'MY_CMD $MERGED',
+            'invoke.return_value': 0
+        }
+        launcher = Mock(**launcher_args)
+        analyser_args = {'has_remaining_conflicts.return_value': True}
+        analyser = Mock(**analyser_args)
+
+        # When
+        result = merge_with_tool(tool, cfg, args, launcher, analyser)
+
+        # Then
+        self.assertEqual(result, ERROR_CONFLICTS)
         launcher.invoke.assert_called_with('MY_CMD ' + args.merged)
 
     def test_merge_with_tools_all_fail(self):
@@ -182,9 +215,10 @@ class AMTTest(unittest.TestCase):
             'invoke.return_value': 1
         }
         launcher = Mock(**launcher_args)
+        analyser = Mock()
 
         # When
-        result = merge(cfg, args, launcher)
+        result = merge(cfg, args, launcher, analyser)
 
         # Then
         self.assertEqual(result, ERROR_CONFLICTS)
@@ -209,9 +243,10 @@ class AMTTest(unittest.TestCase):
             'invoke.return_value': 0
         }
         launcher = Mock(**launcher_args)
+        analyser = Mock()
 
         # When
-        result = merge(cfg, args, launcher)
+        result = merge(cfg, args, launcher, analyser)
 
         # Then
         self.assertEqual(result, SUCCESSFUL_MERGE)
@@ -224,9 +259,10 @@ class AMTTest(unittest.TestCase):
         cfg.set(SECT_AMT, OPT_TOOLS, '')
         args = create_args()
         launcher = Mock()
+        analyser = Mock()
 
         # When
-        result = merge(cfg, args, launcher)
+        result = merge(cfg, args, launcher, analyser)
 
         # Then
         self.assertEqual(result, ERROR_NO_TOOL)
@@ -238,10 +274,11 @@ class AMTTest(unittest.TestCase):
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
         launcher = Mock(side_effect=lambda cmd: 1)
+        analyser = Mock()
 
         # When
         with self.assertRaises(RuntimeError):
-            merge(cfg, args, launcher)
+            merge(cfg, args, launcher, analyser)
 
         # Then
         launcher.assert_not_called()
