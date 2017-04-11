@@ -199,6 +199,7 @@ def clean_reports(merged):
     print(" [AMT] * Cleaning up reports")
     abs_path = os.path.abspath(merged)
     dir_path = os.path.dirname(abs_path)
+    base_name = os.path.basename(abs_path)
     for file in os.listdir(dir_path):
         if file.startswith(base_name) and file.endswith('-report'):
             os.remove(os.path.join(dir_path, file))
