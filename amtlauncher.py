@@ -57,12 +57,12 @@ KNOWN_CMDS = {
               '"$MERGED"',
 
     # Untested Vim
-    'vimdiff': '"{0]" -f -d -c \'4wincmd w | wincmd J\' "$LOCAL" "$BASE" "$REMOTE" "$MERGED"',
-    'gvimdiff': '"{0]" -f -d -c \'4wincmd w | wincmd J\' "$LOCAL" "$BASE" "$REMOTE" "$MERGED"',
-    'vimdiff2': '"{0]" -f -d -c \'wincmd l\' "$LOCAL" "$MERGED" "$REMOTE"',
-    'gvimdiff2': '"{0]" -f -d -c \'wincmd l\' "$LOCAL" "$MERGED" "$REMOTE"',
-    'vimdiff3': '"{0]" -f -d -c \'hid | hid | hid\' "$LOCAL" "$REMOTE" "$BASE" "$MERGED"',
-    'gvimdiff3': '"{0]" -f -d -c \'hid | hid | hid\' "$LOCAL" "$REMOTE" "$BASE" "$MERGED"',
+    'vimdiff': '"{0}" -f -d -c \'4wincmd w | wincmd J\' "$LOCAL" "$BASE" "$REMOTE" "$MERGED"',
+    'gvimdiff': '"{0}" -f -d -c \'4wincmd w | wincmd J\' "$LOCAL" "$BASE" "$REMOTE" "$MERGED"',
+    'vimdiff2': '"{0}" -f -d -c \'wincmd l\' "$LOCAL" "$MERGED" "$REMOTE"',
+    'gvimdiff2': '"{0}" -f -d -c \'wincmd l\' "$LOCAL" "$MERGED" "$REMOTE"',
+    'vimdiff3': '"{0}" -f -d -c \'hid | hid | hid\' "$LOCAL" "$REMOTE" "$BASE" "$MERGED"',
+    'gvimdiff3': '"{0}" -f -d -c \'hid | hid | hid\' "$LOCAL" "$REMOTE" "$BASE" "$MERGED"',
 
     # Untested 3rd party solvers, Mac / Windows only
     'araxis': '"{0}" -wait -merge -3 -a1 '
