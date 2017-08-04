@@ -10,7 +10,7 @@ from amtanalyser import *
 
 # CONSTANTS
 GLOBAL_CONFIG = os.path.expanduser('~/.gitconfig')
-LOCAL_CONFIG_NAME = 'gitconfig'
+LOCAL_CONFIG_NAME = 'config'
 
 SECT_AMT = 'amt'
 OPT_TOOLS = 'tools'
