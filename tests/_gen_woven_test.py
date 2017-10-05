@@ -3,6 +3,7 @@
 
 import unittest
 
+from amtutils import Conflict
 from gen_woven import *
 
 
