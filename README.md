@@ -35,7 +35,7 @@ Just use it as your default `mergetool`
 
 ## Contribute
 
-If you want to contribute, please follow the [Contribution guidelines](https://github.com/xgouchet/AutoMergeTool/wiki/Contribute).
+If you want to contribute, please follow the [Contribution guidelines](CONTRIBUTING.md).
 
 ## See Also
 
