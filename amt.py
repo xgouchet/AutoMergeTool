@@ -4,9 +4,10 @@
 import argparse
 import os
 import configparser
+import sys
 
-from amtlauncher import *
-from amtanalyser import *
+from amtlauncher import ToolsLauncher
+from amtanalyser import ConflictedFileAnalyser
 
 # CONSTANTS
 GLOBAL_CONFIG = os.path.expanduser('~/.gitconfig')
@@ -38,7 +39,6 @@ def parse_arguments():
     parser.add_argument('-m', '--merged', required=True)
 
     # convert to absolute path
-    working_dir = os.getcwd()
     parsed_arg = parser.parse_args()
 
     parsed_arg.base = os.path.abspath(parsed_arg.base)
@@ -48,7 +48,7 @@ def parse_arguments():
     return parsed_arg
 
 
-def find_local_config(config_file):
+def find_local_config_path(config_file):
     """
     Finds the nearest parent directory where there is a .git folder
     """
@@ -58,13 +58,13 @@ def find_local_config(config_file):
 
     git = os.path.join(parent, ".git")
     if os.path.exists(git):
-        local_config_path = os.path.join(git, LOCAL_CONFIG_NAME)
-        if os.path.exists(local_config_path):
-            return local_config_path
+        path = os.path.join(git, LOCAL_CONFIG_NAME)
+        if os.path.exists(path):
+            return path
         else:
             return None
     else:
-        return find_local_config(parent)
+        return find_local_config_path(parent)
 
 
 def read_config(config_path):
@@ -193,8 +193,8 @@ def clean_reports(merged):
     """
     Cleans up the reports for the given file
     """
-    if config.has_option(SECT_AMT, OPT_KEEP_REPORTS):
-        if config.get(SECT_AMT, OPT_KEEP_REPORTS) == "true":
+    if merged_config.has_option(SECT_AMT, OPT_KEEP_REPORTS):
+        if merged_config.get(SECT_AMT, OPT_KEEP_REPORTS) == "true":
             return
     print(" [AMT] * Cleaning up reports")
     abs_path = os.path.abspath(merged)
@@ -206,15 +206,15 @@ def clean_reports(merged):
 
 
 if __name__ == '__main__':
-    args = parse_arguments()
+    cli_args = parse_arguments()
 
-    local_config = find_local_config(args.merged)
-    config = read_config(local_config)
-    launcher = ToolsLauncher(config)
-    analyser = ConflictedFileAnalyser()
-    result = merge(config, args, launcher, analyser)
+    local_config_path = find_local_config_path(cli_args.merged)
+    merged_config = read_config(local_config_path)
+    tools_launcher = ToolsLauncher(merged_config)
+    conflict_analyser = ConflictedFileAnalyser()
+    result = merge(merged_config, cli_args, tools_launcher, conflict_analyser)
 
     if result == 0:
-        clean_reports(args.merged)
+        clean_reports(cli_args.merged)
 
     sys.exit(result)

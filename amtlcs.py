@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+
 
 class LCSAnalyser:
     """
@@ -17,13 +19,14 @@ class LCSAnalyser:
 
     def lcs(self, b, l, r):
         """
-        Returns the longuest-common-subsequence between three strings/arrays
+        Returns the longest common sub-sequence between three strings/arrays
         """
+        self.__reset_lcs_cache()
+
         size = max(len(b), len(l), len(r))
-        self.__reset_lcs_cache(size)
         subs = self.__lcs(b, len(b) - 1, l, len(l) - 1, r, len(r) - 1, size)
-        self.__reset_lcs_cache(size)
-        return self.__concatenate_subsequences(subs)
+
+        return self.__concatenate_sub_sequences(subs)
 
     def __lcs(self, b, pos_b, l, pos_l, r, pos_r, size):
         i = pos_b
@@ -31,9 +34,9 @@ class LCSAnalyser:
         k = pos_r
 
         if (i >= 0) and (j >= 0) and (k >= 0):
-            if (self.comparator(b[i], l[j]) and self.comparator(l[j], r[k])):
+            if self.comparator(b[i], l[j]) and self.comparator(l[j], r[k]):
                 return self.__cached_lcs(b, i - 1, l, j - 1, r, k - 1,
-                                         size) + [Subsequence(self.boxing(b[i]), i, j, k)]
+                                         size) + [SubSequence(self.boxing(b[i]), i, j, k)]
             else:
                 tmp_b = self.__cached_lcs(b, i - 1, l, j, r, k, size)
                 tmp_l = self.__cached_lcs(b, i, l, j - 1, r, k, size)
@@ -46,24 +49,24 @@ class LCSAnalyser:
                 elif (len(tmp_r) >= len(tmp_b)) and (len(tmp_r) >= len(tmp_l)):
                     return tmp_r
                 else:
-                    raise RuntimeException("Oops")
+                    raise RuntimeError("Oops")
         else:
             return []
 
-    def __concatenate_subsequences(self, subs):
+    def __concatenate_sub_sequences(self, subs):
         result = []
         curr = None
         last_b = last_l = last_r = -1
 
         for sub in subs:
-            if (curr == None):
+            if curr is None:
                 curr = sub
                 last_b = sub.pos_b
                 last_l = sub.pos_l
                 last_r = sub.pos_r
             elif (sub.pos_b == last_b + 1) and (sub.pos_l == last_l + 1) and (
                     sub.pos_r == last_r + 1):
-                curr = Subsequence(
+                curr = SubSequence(
                     self.concatenate(curr.content, sub.content), curr.pos_b, curr.pos_l, curr.pos_r)
                 last_b = sub.pos_b
                 last_l = sub.pos_l
@@ -74,12 +77,12 @@ class LCSAnalyser:
                 last_b = sub.pos_b
                 last_l = sub.pos_l
                 last_r = sub.pos_r
-        if curr != None:
+        if curr is not None:
             result += [curr]
 
         return result
 
-    def __reset_lcs_cache(self, size):
+    def __reset_lcs_cache(self):
         self.__lcs_cache = {}
 
     def __cached_lcs(self, b, pos_b, l, pos_l, r, pos_r, size):
@@ -92,9 +95,9 @@ class LCSAnalyser:
             return res
 
 
-class Subsequence:
+class SubSequence:
     """
-    Represents a subsequence in an LCS result
+    Represents a sub-sequence in an LCS result
     """
 
     def __init__(self, content, pos_b, pos_l, pos_r):

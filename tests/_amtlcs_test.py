@@ -33,7 +33,7 @@ class LCSTest(unittest.TestCase):
         result = a.lcs(b, l, r)
 
         # Then
-        expected = [Subsequence("e", 1, 1, 1), Subsequence("t", 3, 3, 3)]
+        expected = [SubSequence("e", 1, 1, 1), SubSequence("t", 3, 3, 3)]
         self.assertEqual(result, expected)
 
     def test_medium(self):
@@ -49,8 +49,8 @@ class LCSTest(unittest.TestCase):
 
         # Then
         expected = [
-            Subsequence("He", 0, 0, 0), Subsequence("ll", 2, 5, 6), Subsequence("o", 20, 10, 12),
-            Subsequence(" ", 23, 12, 14)
+            SubSequence("He", 0, 0, 0), SubSequence("ll", 2, 5, 6), SubSequence("o", 20, 10, 12),
+            SubSequence(" ", 23, 12, 14)
         ]
         self.assertEqual(result, expected)
 
@@ -67,8 +67,8 @@ class LCSTest(unittest.TestCase):
 
         # Then
         expected = [
-            Subsequence("He", 0, 0, 0), Subsequence("l", 2, 5, 4), Subsequence("l", 3, 6, 8),
-            Subsequence("o", 20, 10, 13), Subsequence(" ", 23, 12, 16)
+            SubSequence("He", 0, 0, 0), SubSequence("l", 2, 5, 4), SubSequence("l", 3, 6, 8),
+            SubSequence("o", 20, 10, 13), SubSequence(" ", 23, 12, 16)
         ]
         self.assertEqual(result, expected)
 
@@ -85,7 +85,7 @@ class LCSTest(unittest.TestCase):
         result = a.lcs(b, l, r)
 
         # Then
-        expected = [Subsequence("T;E;S;T", 3, 4, 0)]
+        expected = [SubSequence("T;E;S;T", 3, 4, 0)]
         self.assertEqual(result, expected)
 
     def test_reorder(self):

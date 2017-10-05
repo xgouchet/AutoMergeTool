@@ -287,7 +287,7 @@ class AMTTest(unittest.TestCase):
         path = '/dev/null'
 
         # When
-        config = find_local_config(path)
+        config = find_local_config_path(path)
 
         # Then
         self.assertEqual(config, None)
