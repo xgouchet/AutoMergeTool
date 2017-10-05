@@ -4,7 +4,6 @@
 import unittest
 from unittest.mock import *
 
-import configparser
 from amt import *
 
 FAKE_TOOL = 'blu'

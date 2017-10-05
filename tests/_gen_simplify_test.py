@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import unittest
 import random
 import string
+import unittest
 
 from gen_simplify import *
 

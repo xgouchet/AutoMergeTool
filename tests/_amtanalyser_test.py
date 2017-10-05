@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import configparser
 import unittest
 
 from amtanalyser import *
 
-CFA_PATH = 'tests/unit/analyser/{0}.txt'
+CFA_PATH = 'tests/data/analyser/{0}.txt'
 
 
 class ConflictedFileAnalyserTest(unittest.TestCase):

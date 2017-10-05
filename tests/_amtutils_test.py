@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import unittest
 import filecmp
-import os
+import unittest
+
 from amtutils import *
 
-CW_PATH = 'tests/unit/conflict_walker/{0}.txt'
+CW_PATH = 'tests/data/conflict_walker/{0}.txt'
 
 RESOLUTION = "Nunc quis interdum nunc. Praesent mollis risus enim, at elementum quam finibus ut.\n"
 
