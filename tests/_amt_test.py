@@ -3,6 +3,7 @@
 
 import unittest
 from unittest.mock import *
+from configparser import ConfigParser
 
 from amt import *
 
@@ -27,7 +28,7 @@ class AMTTest(unittest.TestCase):
     def test_merge_with_none(self):
         # Given
         tool = None
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
@@ -44,7 +45,7 @@ class AMTTest(unittest.TestCase):
     def test_merge_with_bad_extensions(self):
         # Given
         tool = FAKE_TOOL
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
@@ -61,7 +62,7 @@ class AMTTest(unittest.TestCase):
     def test_merge_with_ignored_extensions(self):
         # Given
         tool = FAKE_TOOL
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
@@ -81,7 +82,7 @@ class AMTTest(unittest.TestCase):
     def test_merge_with_unknown_tool(self):
         # Given
         tool = FAKE_TOOL
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
@@ -102,7 +103,7 @@ class AMTTest(unittest.TestCase):
     def test_merge_with_tool_success(self):
         # Given
         tool = FAKE_TOOL
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
@@ -127,7 +128,7 @@ class AMTTest(unittest.TestCase):
     def test_merge_with_tool_remaining_conflicts(self):
         # Given
         tool = FAKE_TOOL
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
@@ -152,7 +153,7 @@ class AMTTest(unittest.TestCase):
     def test_merge_with_tool_untrusted_solved(self):
         # Given
         tool = FAKE_TOOL
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
@@ -177,7 +178,7 @@ class AMTTest(unittest.TestCase):
     def test_merge_with_tool_untrusted_unsolved(self):
         # Given
         tool = FAKE_TOOL
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()
@@ -201,7 +202,7 @@ class AMTTest(unittest.TestCase):
 
     def test_merge_with_tools_all_fail(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_TOOLS, 'foo;bar;baz')
         args = create_args()
@@ -210,7 +211,7 @@ class AMTTest(unittest.TestCase):
             'get_tool_extensions.return_value': None,
             'get_tool_ignored_extensions.return_value': None,
             'get_tool_cmd.side_effect':
-            ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
+                ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
             'invoke.return_value': 1
         }
         launcher = Mock(**launcher_args)
@@ -229,7 +230,7 @@ class AMTTest(unittest.TestCase):
 
     def test_merge_with_tools_first_succeeds(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_TOOLS, 'foo;bar;baz')
         args = create_args()
@@ -238,7 +239,7 @@ class AMTTest(unittest.TestCase):
             'get_tool_extensions.return_value': None,
             'get_tool_ignored_extensions.return_value': None,
             'get_tool_cmd.side_effect':
-            ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
+                ['MY_CMD1 $MERGED', 'MY_CMD2 --out $MERGED', 'MY_CMD3 $BASE $MERGED'],
             'invoke.return_value': 0
         }
         launcher = Mock(**launcher_args)
@@ -253,7 +254,7 @@ class AMTTest(unittest.TestCase):
 
     def test_merge_with_tools_empty(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_TOOLS, '')
         args = create_args()
@@ -268,7 +269,7 @@ class AMTTest(unittest.TestCase):
 
     def test_merge_not_configured(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.add_section(SECT_AMT)
         cfg.set(SECT_AMT, OPT_VERBOSE, 'true')
         args = create_args()

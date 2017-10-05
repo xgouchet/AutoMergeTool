@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import argparse
 import os
-import configparser
 import sys
+from argparse import ArgumentParser, Namespace
+from configparser import RawConfigParser
+from typing import Optional
 
-from amtlauncher import ToolsLauncher
 from amtanalyser import ConflictedFileAnalyser
+from amtlauncher import ToolsLauncher
+from amtutils import SUCCESSFUL_MERGE, ERROR_CONFLICTS, ERROR_EXTENSION, ERROR_INVOCATION, ERROR_NO_TOOL, ERROR_UNKNOWN
 
 # CONSTANTS
 GLOBAL_CONFIG = os.path.expanduser('~/.gitconfig')
@@ -18,20 +20,12 @@ OPT_TOOLS = 'tools'
 OPT_VERBOSE = 'verbose'
 OPT_KEEP_REPORTS = 'keepReport'
 
-SUCCESSFUL_MERGE = 0
-ERROR_NO_TOOL = 1
-ERROR_EXTENSION = 2
-ERROR_UNKNOWN = 3
-ERROR_CONFLICTS = 4
-ERROR_UNTRUSTED = 5
-ERROR_INVOCATION = 6
 
-
-def parse_arguments():
+def parse_arguments() -> Namespace:
     """
     Parses the arguments passed on invocation in a dict and return it
     """
-    parser = argparse.ArgumentParser(description="A tool to combine multiple merge tools")
+    parser = ArgumentParser(description="A tool to combine multiple merge tools")
 
     parser.add_argument('-b', '--base', required=True)
     parser.add_argument('-l', '--local', required=True)
@@ -48,7 +42,7 @@ def parse_arguments():
     return parsed_arg
 
 
-def find_local_config_path(config_file):
+def find_local_config_path(config_file: str) -> Optional[str]:
     """
     Finds the nearest parent directory where there is a .git folder
     """
@@ -67,11 +61,11 @@ def find_local_config_path(config_file):
         return find_local_config_path(parent)
 
 
-def read_config(config_path):
+def read_config(config_path: str) -> RawConfigParser:
     """
     Reads the AMT configuration from the given path
     """
-    config = configparser.RawConfigParser()
+    config = RawConfigParser()
     config.optionxform = str
     config.read_file(open(GLOBAL_CONFIG))
     if config_path:
@@ -80,7 +74,8 @@ def read_config(config_path):
     return config
 
 
-def expand_arguments(cmd, args):
+# noinspection PyUnresolvedReferences
+def expand_arguments(cmd: str, args: Namespace) -> str:
     """
     Expands the named arguments in the command line invocation
     cmd -- the command line invocation
@@ -93,7 +88,31 @@ def expand_arguments(cmd, args):
     return cmd
 
 
-def merge_with_tool(tool, config, args, launcher, analyser):
+def merge(config: RawConfigParser, args: Namespace, launcher: ToolsLauncher, analyser: ConflictedFileAnalyser) -> int:
+    """
+    Handle the merge tools chain for the given argument
+    config -- the current amt configuration
+    args -- the arguments with the base, local, remote and merged file names
+    launcher -- the launcher helper
+    """
+    if not (config.has_option(SECT_AMT, OPT_TOOLS)):
+        raise RuntimeError('Missing the {0}.{1} configuration'.format(SECT_AMT, OPT_TOOLS))
+
+    tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
+    merge_result = ERROR_NO_TOOL
+
+    for tool in tools:
+        merge_result = merge_with_tool(tool, config, args, launcher, analyser)
+        if merge_result == 0:
+            return 0
+
+    print(" [AMT] ⚑ Sorry, it seems we can't solve it this time")
+
+    return merge_result
+
+
+def merge_with_tool(tool: str, config: RawConfigParser, args: Namespace, launcher: ToolsLauncher,
+                    analyser: ConflictedFileAnalyser) -> int:
     """
     Run the given merge tool with the config and args
     """
@@ -111,6 +130,7 @@ def merge_with_tool(tool, config, args, launcher, analyser):
     extensions = launcher.get_tool_extensions(tool)
     ignored_extensions = launcher.get_tool_ignored_extensions(tool)
     if extensions or ignored_extensions:
+        # noinspection PyUnresolvedReferences
         file_name, file_ext = os.path.splitext(args.merged)
         file_ext = file_ext[1:]
         if (extensions is not None) and (file_ext not in extensions):
@@ -155,6 +175,7 @@ def merge_with_tool(tool, config, args, launcher, analyser):
     else:
         if verbose:
             print(" [AMT] ? {0} returned, but this should not be trusted".format(tool))
+        # noinspection PyUnresolvedReferences
         has_remaining = analyser.has_remaining_conflicts(args.merged)
         if has_remaining == 0:
             if verbose:
@@ -166,38 +187,15 @@ def merge_with_tool(tool, config, args, launcher, analyser):
             return ERROR_CONFLICTS
 
 
-def merge(config, args, launcher, analyser):
-    """
-    Handle the mergetools chain for the given argument
-    config -- the current amt configuration
-    args -- the arguments with the base, local, remote and merged filenames
-    launcher -- the launcher helper
-    """
-    if not (config.has_option(SECT_AMT, OPT_TOOLS)):
-        raise RuntimeError('Missing the {0}.{1} configuration'.format(SECT_AMT, OPT_TOOLS))
-
-    tools = config.get(SECT_AMT, OPT_TOOLS).split(';')
-    merge_result = ERROR_NO_TOOL
-
-    for tool in tools:
-        merge_result = merge_with_tool(tool, config, args, launcher, analyser)
-        if merge_result == 0:
-            return 0
-
-    print(" [AMT] ⚑ Sorry, it seems we can't solve it this time")
-
-    return merge_result
-
-
-def clean_reports(merged):
+def clean_reports(config: RawConfigParser, merged_path: str):
     """
     Cleans up the reports for the given file
     """
-    if merged_config.has_option(SECT_AMT, OPT_KEEP_REPORTS):
-        if merged_config.get(SECT_AMT, OPT_KEEP_REPORTS) == "true":
+    if config.has_option(SECT_AMT, OPT_KEEP_REPORTS):
+        if config.get(SECT_AMT, OPT_KEEP_REPORTS) == "true":
             return
     print(" [AMT] * Cleaning up reports")
-    abs_path = os.path.abspath(merged)
+    abs_path = os.path.abspath(merged_path)
     dir_path = os.path.dirname(abs_path)
     base_name = os.path.basename(abs_path)
     for file in os.listdir(dir_path):
@@ -208,13 +206,15 @@ def clean_reports(merged):
 if __name__ == '__main__':
     cli_args = parse_arguments()
 
-    local_config_path = find_local_config_path(cli_args.merged)
+    # noinspection PyUnresolvedReferences
+    merged_file_path = cli_args.merged
+    local_config_path = find_local_config_path(merged_file_path)
     merged_config = read_config(local_config_path)
     tools_launcher = ToolsLauncher(merged_config)
     conflict_analyser = ConflictedFileAnalyser()
     result = merge(merged_config, cli_args, tools_launcher, conflict_analyser)
 
-    if result == 0:
-        clean_reports(cli_args.merged)
+    if result == SUCCESSFUL_MERGE:
+        clean_reports(merged_config, merged_file_path)
 
     sys.exit(result)

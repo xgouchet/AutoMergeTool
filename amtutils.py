@@ -3,6 +3,7 @@
 
 import os
 import sys
+from typing import Optional
 
 CONFLICT_START = "<<<<<<<"
 CONFLICT_BASE = "|||||||"
@@ -14,6 +15,15 @@ REPORT_SOLVED = "solved"
 REPORT_UNSOLVED = "unsolved"
 REPORT_FULL = "full"
 
+SUCCESSFUL_MERGE = 0
+ERROR_NO_TOOL = 1
+ERROR_EXTENSION = 2
+ERROR_UNKNOWN = 3
+ERROR_CONFLICTS = 4
+ERROR_UNTRUSTED = 5
+ERROR_INVOCATION = 6
+
+
 # TODO add docstrings for this file
 
 
@@ -23,7 +33,7 @@ class Conflict:
     versions
     """
 
-    def __init__(self, local, base, remote, marker_local, marker_remote):
+    def __init__(self, local: str, base: str, remote: str, marker_local: str, marker_remote: str):
         self.local = local
         self.base = base
         self.remote = remote
@@ -33,29 +43,30 @@ class Conflict:
         self.content = None
         self.resolved = False
 
-    def resolve(self, resolution):
+    def resolve(self, resolution: str):
         self.content = resolution
         self.resolved = True
 
-    def rewrite(self, content):
+    def rewrite(self, content: str):
         self.content = content
 
-    def is_rewritten(self):
+    def is_rewritten(self) -> bool:
         return self.content is not None
 
-    def is_resolved(self):
+    def is_resolved(self) -> bool:
         return self.resolved
 
-    def local_lines(self):
-        return self.__lines(self.local)
+    def local_lines(self) -> list:
+        return Conflict.__lines(self.local)
 
-    def base_lines(self):
-        return self.__lines(self.base)
+    def base_lines(self) -> list:
+        return Conflict.__lines(self.base)
 
-    def remote_lines(self):
-        return self.__lines(self.remote)
+    def remote_lines(self) -> list:
+        return Conflict.__lines(self.remote)
 
-    def __lines(self, block):
+    @staticmethod
+    def __lines(block: str) -> list:
         lines = block.split('\n')
         filtered = list(filter(lambda x: len(x) > 0, lines))
         mapped = list(map(lambda x: x + "\n", filtered))
@@ -68,23 +79,24 @@ class ConflictsWalker:
     and rewrite the merged file if needed
     """
 
-    def __init__(self, merged, report_name=None, report_type=REPORT_NONE, verbose=False):
+    def __init__(self, merged_path: str, report_name: Optional[str] = None, report_type: str = REPORT_NONE,
+                 verbose: bool = False):
         self.verbose = verbose
         self.log_tag = report_name
-        self.conflicted = merged
-        self.merged = merged + ".resolving.amt"
+        self.conflicted = merged_path
+        self.merged = merged_path + ".resolving.amt"
         self.conflicted_file = open(self.conflicted)
         self.merged_file = open(self.merged, 'w')
         self.conflict = None
         self.has_remaining_conflicts = False
         if report_name and report_type and report_type != REPORT_NONE:
-            self.report_file = open(merged + "." + report_name + "-report", 'w')
+            self.report_file = open(merged_path + "." + report_name + "-report", 'w')
             self.report_type = report_type
         else:
             self.report_file = None
             self.report_type = REPORT_NONE
 
-    def has_more_conflicts(self):
+    def has_more_conflicts(self) -> bool:
         self.write_previous_conflict()
         self.write_previous_conflict_report()
         self.log_previous_conflict()
@@ -142,10 +154,10 @@ class ConflictsWalker:
             self.conflict = Conflict(sections[0], sections[1], sections[2], markers[0], markers[1])
             return True
 
-    def next_conflict(self):
+    def next_conflict(self) -> Conflict:
         return self.conflict
 
-    def end(self, apply=True):
+    def end(self, apply: bool = True):
         self.conflicted_file.close()
         self.merged_file.close()
 
@@ -155,22 +167,21 @@ class ConflictsWalker:
         if self.report_file:
             self.report_file.close()
 
-    def get_merge_status(self):
+    def get_merge_status(self) -> int:
         """
         Returns the global merge status to report
-        0 if all conflicts are solved
-        1 if their are remaining unresolved conflicts
+        Either SUCCESSFUL_MERGE or one of the ERROR_xxx constants
         """
         if self.has_remaining_conflicts:
-            return 1
+            return ERROR_CONFLICTS
         else:
-            return 0
+            return SUCCESSFUL_MERGE
 
     def write_previous_conflict(self):
         """
         Writes the last conflict to the merged file (either the resolution or the original conflict)
         """
-        if self.conflict != None:
+        if self.conflict is not None:
             if self.conflict.is_rewritten():
                 self.merged_file.write(self.conflict.content)
             else:
@@ -183,7 +194,7 @@ class ConflictsWalker:
         Writes the last seen conflict in the report file
         """
         if self.report_file and self.report_type != REPORT_NONE:
-            if self.conflict != None:
+            if self.conflict is not None:
                 if self.conflict.is_resolved():
                     if (self.report_type == REPORT_SOLVED) or (self.report_type == REPORT_FULL):
                         self.report_file.write("\n*******  CONFLICT  *******\n")
@@ -207,7 +218,7 @@ class ConflictsWalker:
         Logs the last seen conflict in the standard output
         """
         if self.verbose:
-            if self.conflict != None:
+            if self.conflict is not None:
                 print(self.conflict.raw)
 
                 if self.conflict.is_resolved():

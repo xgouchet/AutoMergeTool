@@ -27,7 +27,7 @@ class ConflictTest(unittest.TestCase):
 
         # Then check the output
         self.assertTrue(filecmp.cmp(walker.merged, file))
-        self.assertEqual(walker.get_merge_status(), 0)
+        self.assertEqual(walker.get_merge_status(), SUCCESSFUL_MERGE)
         os.remove(walker.merged)
 
     def test_single_conflict_unsolved(self):
@@ -44,7 +44,7 @@ class ConflictTest(unittest.TestCase):
 
         # Then check the output
         self.assertTrue(filecmp.cmp(walker.merged, file))
-        self.assertEqual(walker.get_merge_status(), 1)
+        self.assertEqual(walker.get_merge_status(), ERROR_CONFLICTS)
         os.remove(walker.merged)
 
     def test_single_conflict_rewritten(self):
@@ -63,7 +63,7 @@ class ConflictTest(unittest.TestCase):
 
         # Then check the output
         self.assertTrue(filecmp.cmp(walker.merged, CW_PATH.format('single_conflict_resolved')))
-        self.assertEqual(walker.get_merge_status(), 1)
+        self.assertEqual(walker.get_merge_status(), ERROR_CONFLICTS)
         os.remove(walker.merged)
 
     def test_single_conflict_solved(self):
@@ -82,7 +82,7 @@ class ConflictTest(unittest.TestCase):
 
         # Then check the output
         self.assertTrue(filecmp.cmp(walker.merged, CW_PATH.format('single_conflict_resolved')))
-        self.assertEqual(walker.get_merge_status(), 0)
+        self.assertEqual(walker.get_merge_status(), SUCCESSFUL_MERGE)
         os.remove(walker.merged)
 
     def test_three_conflicts_half_solved_with_full_report(self):
@@ -109,7 +109,7 @@ class ConflictTest(unittest.TestCase):
         self.assertTrue(
             filecmp.cmp(file + '.test-report',
                         CW_PATH.format('three_conflicts_half_solved') + '.test-full-report'))
-        self.assertEqual(walker.get_merge_status(), 1)
+        self.assertEqual(walker.get_merge_status(), ERROR_CONFLICTS)
         os.remove(walker.merged)
 
     def test_three_conflicts_half_solved_with_solved_report(self):
@@ -136,7 +136,7 @@ class ConflictTest(unittest.TestCase):
         self.assertTrue(
             filecmp.cmp(file + '.test-report',
                         CW_PATH.format('three_conflicts_half_solved') + '.test-solved-report'))
-        self.assertEqual(walker.get_merge_status(), 1)
+        self.assertEqual(walker.get_merge_status(), ERROR_CONFLICTS)
         os.remove(walker.merged)
 
     def test_three_conflicts_half_solved_with_unsolved_report(self):
@@ -163,7 +163,7 @@ class ConflictTest(unittest.TestCase):
         self.assertTrue(
             filecmp.cmp(file + '.test-report',
                         CW_PATH.format('three_conflicts_half_solved') + '.test-unsolved-report'))
-        self.assertEqual(walker.get_merge_status(), 1)
+        self.assertEqual(walker.get_merge_status(), ERROR_CONFLICTS)
         os.remove(walker.merged)
 
     def test_missing_base_side(self):
@@ -226,7 +226,7 @@ class ConflictTest(unittest.TestCase):
         """Tests how a conflict extracts lines from blocks"""
 
         # Given a file to merge
-        local = "\n"  #empty
+        local = "\n"  # empty
         base = "foo\nbar\nbaz\neggs\nbacon\n"
         remote = "hello world\n"
         conflict = Conflict(local, base, remote, "<<<<<<<\n", ">>>>>>>\n")

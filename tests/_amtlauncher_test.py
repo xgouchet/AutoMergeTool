@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import configparser
 import unittest
+from configparser import ConfigParser
 
 from amtlauncher import *
 
@@ -13,18 +13,18 @@ FAKE_TOOL_SECTION = 'mergetool "blu"'
 class ToolsLauncherTest(unittest.TestCase):
     def test_write_section_name(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
 
         # When
-        section = launcher.tool_section_name(FAKE_TOOL)
+        section = ToolsLauncher.tool_section_name(FAKE_TOOL)
 
         # Then
         self.assertEqual(section, FAKE_TOOL_SECTION)
 
     def test_get_tool_trust_from_config_none(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
 
         # When
@@ -35,7 +35,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_trust_from_config_overriden_false(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_TRUST_EXIT_CODE, 'false')
@@ -49,7 +49,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_trust_from_config_overriden_true(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_TRUST_EXIT_CODE, 'true')
@@ -63,7 +63,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_trust_from_config_overriden_not_boolean(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_TRUST_EXIT_CODE, 'plop')
@@ -75,7 +75,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_trust_from_config_known(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
 
         # When
@@ -86,7 +86,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_extensions_none(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
 
         # When
@@ -97,7 +97,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_extensions_override(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_EXTENSIONS, 'a;b;c')
@@ -111,7 +111,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_extensions_known(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
 
         # When
@@ -122,7 +122,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_ignored_extensions_none(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
 
         # When
@@ -133,7 +133,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_ignored_extensions_override(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_IGNORED_EXTENSIONS, 'a;b;c')
@@ -147,7 +147,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_path_none(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
 
         # When
@@ -158,7 +158,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_path_override(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_PATH, '/path/to/bar')
@@ -172,7 +172,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_path_known(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
 
         # When
@@ -183,7 +183,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_cmd_none(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
 
         # When
@@ -194,7 +194,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_cmd_overriden(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.optionxform = str
         cfg.add_section(FAKE_TOOL_SECTION)
         cfg.set(FAKE_TOOL_SECTION, OPT_CMD, 'spam')
@@ -208,7 +208,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_cmd_known(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         launcher = ToolsLauncher(cfg)
         interpreter = sys.executable
 
@@ -220,7 +220,7 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_get_tool_cmd_known_with_options(self):
         # Given
-        cfg = configparser.ConfigParser()
+        cfg = ConfigParser()
         cfg.optionxform = str
         cfg.add_section('mergetool "gen_debug"')
         cfg.set('mergetool "gen_debug"', 'breakfast', 'bacon')
@@ -237,36 +237,33 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_sanitize_command_simple(self):
         # Given
-        cfg = configparser.ConfigParser()
-        launcher = ToolsLauncher(cfg)
+        cfg = ConfigParser()
         cmd = "foo -o /dev/null/base /dev/null/merged"
 
         # When
-        tokens = launcher.sanitize_command(cmd)
+        tokens = ToolsLauncher.sanitize_command(cmd)
 
         # Then
         self.assertEqual(tokens, ['foo', '-o', '/dev/null/base', '/dev/null/merged'])
 
     def test_sanitize_command_with_whitespaces(self):
         # Given
-        cfg = configparser.ConfigParser()
-        launcher = ToolsLauncher(cfg)
+        cfg = ConfigParser()
         cmd = "foo -o  \n  /dev/null/base \t\t /dev/null/merged"
 
         # When
-        tokens = launcher.sanitize_command(cmd)
+        tokens = ToolsLauncher.sanitize_command(cmd)
 
         # Then
         self.assertEqual(tokens, ['foo', '-o', '/dev/null/base', '/dev/null/merged'])
 
     def test_sanitize_command_with_quotes(self):
         # Given
-        cfg = configparser.ConfigParser()
-        launcher = ToolsLauncher(cfg)
+        cfg = ConfigParser()
         cmd = "foo -o '/dev/null/base with space' '/dev/null/mergedwith\"e'"
 
         # When
-        tokens = launcher.sanitize_command(cmd)
+        tokens = ToolsLauncher.sanitize_command(cmd)
 
         # Then
         self.assertEqual(tokens,
@@ -274,12 +271,11 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_sanitize_command_with_double_quotes(self):
         # Given
-        cfg = configparser.ConfigParser()
-        launcher = ToolsLauncher(cfg)
+        cfg = ConfigParser()
         cmd = 'foo -o "/dev/null/base with space" "/dev/null/mergedwith\'e"'
 
         # When
-        tokens = launcher.sanitize_command(cmd)
+        tokens = ToolsLauncher.sanitize_command(cmd)
 
         # Then
         self.assertEqual(tokens,
@@ -287,12 +283,11 @@ class ToolsLauncherTest(unittest.TestCase):
 
     def test_sanitize_command_weird_syntax(self):
         # Given
-        cfg = configparser.ConfigParser()
-        launcher = ToolsLauncher(cfg)
+        cfg = ConfigParser()
         cmd = 'foo -o="/dev/null/base" -p=\'/dev/null/merged\''
 
         # When
-        tokens = launcher.sanitize_command(cmd)
+        tokens = ToolsLauncher.sanitize_command(cmd)
 
         # Then
         self.assertEqual(tokens, ['foo', '-o="/dev/null/base"', '-p=\'/dev/null/merged\''])

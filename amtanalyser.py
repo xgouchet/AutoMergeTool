@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+
 from amtutils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
 
 
@@ -12,8 +14,9 @@ class ConflictedFileAnalyser:
     def __init__(self):
         pass
 
-    def has_remaining_conflicts(self, file):
-        with open(file, 'r') as f:
+    # noinspection PyMethodMayBeStatic
+    def has_remaining_conflicts(self, file_path: str) -> bool:
+        with open(file_path, 'r') as f:
             for line in f:
                 if line.startswith(CONFLICT_START) \
                         or line.startswith(CONFLICT_SEP) \
@@ -22,3 +25,7 @@ class ConflictedFileAnalyser:
                     return True
 
         return False
+
+if __name__ == '__main__':
+    print("This is just a utility module, not to be launched directly.")
+    sys.exit(1)

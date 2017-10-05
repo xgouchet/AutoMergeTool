@@ -5,6 +5,8 @@ import inspect
 import os
 import subprocess
 import sys
+from configparser import RawConfigParser
+from typing import Optional, Dict, List
 
 SECT_TOOL_FORMAT = 'mergetool "{0}"'
 OPT_PATH = 'path'
@@ -17,7 +19,7 @@ CURRENT_FRAME = inspect.getfile(inspect.currentframe())
 CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
 CURRENT_INTERPRETER = sys.executable
 
-KNOWN_PATHS = {
+KNOWN_PATHS = {  # type: Dict[str, str]
     'java_imports': CURRENT_DIR + '/java_imports.py',
     'gen_additions': CURRENT_DIR + '/gen_additions.py',
     'gen_deletions': CURRENT_DIR + '/gen_deletions.py',
@@ -26,8 +28,8 @@ KNOWN_PATHS = {
     'gen_woven': CURRENT_DIR + '/gen_woven.py'
 }
 
-KNOWN_CMDS = {
-    # 3rd party solvers (Tested at least once on a Linux Ubuntu Xenial x64)
+KNOWN_CMDS = {  # type: Dict[str, str]
+    # 3rd party solvers (Tested at least once on a Linux Ubuntu Xenial x64 and a Zesty)
     'bc': '"{0}" "$LOCAL" "$REMOTE" "$BASE" '
           '-mergeoutput="$MERGED"',
     'bc3': '"{0}" "$LOCAL" "$REMOTE" "$BASE" '
@@ -81,16 +83,18 @@ KNOWN_CMDS = {
     'winmerge': '"{0}" -u -e -dl Local -dr Remote '
                 '"$LOCAL" "$REMOTE" "$MERGED"',
 
-    # AMT solvers
-    'java_imports': CURRENT_INTERPRETER + ' {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
+    # Generic AMT solvers
     'gen_additions': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_deletions': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_debug': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_simplify': CURRENT_INTERPRETER + ' {0} -m $MERGED',
-    'gen_woven': CURRENT_INTERPRETER + ' {0} -m $MERGED'
-}  # yapf: disable
+    'gen_woven': CURRENT_INTERPRETER + ' {0} -m $MERGED',
 
-KNOWN_TRUSTS = {
+    # Language specific AMT solvers
+    'java_imports': CURRENT_INTERPRETER + ' {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED'
+}
+
+KNOWN_TRUSTS = {  # type: Dict[str, bool]]
     # 3rd party solvers
     'deltawalker': True,
     'emerge': True,
@@ -113,29 +117,30 @@ KNOWN_TRUSTS = {
     'gen_simplify': True
 }
 
-KNOWN_EXTENSIONS = {'java_imports': 'java'}
+KNOWN_EXTENSIONS = {'java_imports': 'java'}  # type: Dict[str, str]
 
 
 class ToolsLauncher:
     """
     """
 
-    def __init__(self, config=None):
+    def __init__(self, config: Optional[RawConfigParser] = None):
         self.config = config
 
-    def tool_section_name(self, tool):
+    @staticmethod
+    def tool_section_name(tool: str) -> str:
         """
         Generates the mergetool section name for the given tool
         eg : tool_section_name("foo") → [mergetool "foo"]
         """
         return SECT_TOOL_FORMAT.format(tool)
 
-    def get_tool_trust(self, tool):
+    def get_tool_trust(self, tool: str) -> bool:
         """
         Check whether we should trust the exit code of the given tool
         tool -- the name of the tool
         """
-        section = self.tool_section_name(tool)
+        section = ToolsLauncher.tool_section_name(tool)
         if self.config.has_option(section, OPT_TRUST_EXIT_CODE):
             return self.config.getboolean(section, OPT_TRUST_EXIT_CODE)
 
@@ -146,7 +151,7 @@ class ToolsLauncher:
         # Default
         return False
 
-    def get_tool_extensions(self, tool):
+    def get_tool_extensions(self, tool: str) -> Optional[List[str]]:
         """
         Get the extensions list the given tool can work on
         tool -- the name of the tool
@@ -158,7 +163,7 @@ class ToolsLauncher:
             extensions = KNOWN_EXTENSIONS[tool]
 
         # Override in config
-        section = self.tool_section_name(tool)
+        section = ToolsLauncher.tool_section_name(tool)
         if self.config.has_option(section, OPT_EXTENSIONS):
             extensions = self.config.get(section, OPT_EXTENSIONS)
 
@@ -167,7 +172,7 @@ class ToolsLauncher:
         else:
             return None
 
-    def get_tool_ignored_extensions(self, tool):
+    def get_tool_ignored_extensions(self, tool: str) -> Optional[List[str]]:
         """
         Get the extensions list the given tool can work on
         tool -- the name of the tool
@@ -175,7 +180,7 @@ class ToolsLauncher:
         ignored_extensions = None
 
         # Check in config
-        section = self.tool_section_name(tool)
+        section = ToolsLauncher.tool_section_name(tool)
         if self.config.has_option(section, OPT_IGNORED_EXTENSIONS):
             ignored_extensions = self.config.get(section, OPT_IGNORED_EXTENSIONS)
 
@@ -184,12 +189,12 @@ class ToolsLauncher:
         else:
             return None
 
-    def get_tool_path(self, tool):
+    def get_tool_path(self, tool: str) -> str:
         """
         Get the path for the given tool
         tool -- the name of the tool
         """
-        section = self.tool_section_name(tool)
+        section = ToolsLauncher.tool_section_name(tool)
         if self.config.has_option(section, OPT_PATH):
             return self.config.get(section, OPT_PATH)
 
@@ -200,13 +205,13 @@ class ToolsLauncher:
         # Default
         return tool
 
-    def get_tool_cmd(self, tool):
+    def get_tool_cmd(self, tool: str) -> Optional[str]:
         """
         Get the command line invocation for the givent tool
         tool -- the name of the tool
         config -- the current amt configuration
         """
-        section = self.tool_section_name(tool)
+        section = ToolsLauncher.tool_section_name(tool)
         if self.config.has_option(section, OPT_CMD):
             return self.config.get(section, OPT_CMD)
 
@@ -225,11 +230,21 @@ class ToolsLauncher:
         # No Default
         return None
 
-    def sanitize_command(self, cmd):
+    # noinspection PyMethodMayBeStatic
+    def invoke(self, cmd: str) -> int:
+        """
+        Invokes the given command
+        :param cmd: the command string
+        """
+        sanitized_cmd = ToolsLauncher.sanitize_command(cmd)
+        return subprocess.call(sanitized_cmd, shell=False)
+
+    @staticmethod
+    def sanitize_command(cmd: str) -> list:
         """
         Sanitizes the command into an array of arguments
-        :param cmd:
-        :return:
+        :param cmd: the command string
+        :return: a list of tokens for the launcher
         """
         within_quote = False
         within_double_quote = False
@@ -270,9 +285,7 @@ class ToolsLauncher:
             tokens.append(accumulator)
         return tokens
 
-    def invoke(self, cmd):
-        """
-        Invokes the given command
-        """
-        sanitized_cmd = self.sanitize_command(cmd)
-        return subprocess.call(sanitized_cmd, shell=False)
+
+if __name__ == '__main__':
+    print("This is just a utility module, not to be launched directly.")
+    sys.exit(1)
