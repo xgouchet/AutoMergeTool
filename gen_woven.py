@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import sys
 
-from amtutils import *
+from amtutils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, ConflictsWalker
 
 
 def parse_arguments():

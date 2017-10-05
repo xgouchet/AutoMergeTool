@@ -17,14 +17,14 @@ class LCSAnalyser:
         self.concatenate = concatenate
         self.boxing = boxing
 
-    def lcs(self, b, l, r):
+    def lcs(self, base, left, right):
         """
         Returns the longest common sub-sequence between three strings/arrays
         """
         self.__reset_lcs_cache()
 
-        size = max(len(b), len(l), len(r))
-        subs = self.__lcs(b, len(b) - 1, l, len(l) - 1, r, len(r) - 1, size)
+        size = max(len(base), len(left), len(right))
+        subs = self.__lcs(base, len(base) - 1, left, len(left) - 1, right, len(right) - 1, size)
 
         return self.__concatenate_sub_sequences(subs)
 

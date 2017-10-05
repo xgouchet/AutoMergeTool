@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import argparse
-from amtutils import *
+import sys
+
+from amtutils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, ConflictsWalker
 
 
 def parse_arguments():
@@ -23,9 +24,9 @@ def parse_arguments():
 
 
 def handle_conflict(conflict):
-    """Handle a conflicts where the changes are woven"""
+    """Handle a conflicts where both local and remote are empty"""
+    # TODO handle the case where both are empty or just blank space
     lines_local = conflict.local_lines()
-    lines_base = conflict.base_lines()
     lines_remote = conflict.remote_lines()
     if len(lines_local) != 0:
         return

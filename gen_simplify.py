@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import sys
 
-from amtlcs import *
-from amtutils import *
+from amtlcs import LCSAnalyser
+from amtutils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, CONFLICT_BASE, CONFLICT_SEP, \
+    ConflictsWalker
 
 
 def parse_arguments():
@@ -40,7 +42,7 @@ def handle_conflict(conflict):
 
     # find common lines
     analyser = LCSAnalyser(concatenate=lambda a, b: list(a) + list(b))
-    result = analyser.lcs(l=lines_local, b=lines_base, r=lines_remote)
+    result = analyser.lcs(base=lines_base, left=lines_local, right=lines_remote)
 
     if len(result) == 0:
         return
@@ -50,7 +52,7 @@ def handle_conflict(conflict):
     resolution = ""
     for sub in result:
         if (sub.pos_b > ib) or (sub.pos_l > il) or (sub.pos_r > ir):
-            # write conflict before subsequence
+            # write conflict before sub-sequence
             resolution += conflict.marker_local
             for line in lines_local[il:sub.pos_l]:
                 resolution += line
@@ -62,7 +64,7 @@ def handle_conflict(conflict):
                 resolution += line
             resolution += conflict.marker_remote
 
-        # write subsequence
+        # write sub-sequence
         size = len(list(sub.content))
         for line in list(sub.content):
             resolution += line

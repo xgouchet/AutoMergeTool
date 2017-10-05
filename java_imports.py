@@ -5,14 +5,11 @@ import argparse
 import sys
 import re
 
+from amtutils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
+
 IMPORT_REGEX = re.compile('^\s*import\s+(static\s+)?(.*)\s*;\s*$')
 PACKAGE_REGEX = re.compile('^\s*package\s+[\w][\w\.]+[\w].*$')
 EMPTY_REGEX = re.compile('^[\s\n]*$')
-
-CONFLICT_START = "<<<<<<<"
-CONFLICT_BASE = "|||||||"
-CONFLICT_SEP = "======="
-CONFLICT_END = ">>>>>>>"
 
 IMPORT_GROUPS = []
 
@@ -45,7 +42,6 @@ def parse_arguments():
     parser.add_argument('-m', '--merged', required=True)
     parser.add_argument(
         '-o', '--order', choices=[ORDER_ECLIPSE, ORDER_IJ_IDEA, ORDER_ANDROID], required=False)
-    parser.add_argument('-c', '--customorder', required=False)
 
     return parser.parse_args()
 
@@ -84,12 +80,12 @@ def get_merge_imports(base_file, local_file, remote_file):
             imports_remote.remove(imp)
     # add imports from local
     for imp in imports_local:
-        if ((imp not in imports_merged) and (imp not in imports_base)):
+        if (imp not in imports_merged) and (imp not in imports_base):
             imports_merged.append(imp)
 
     # add imports from remote
     for imp in imports_remote:
-        if ((imp not in imports_merged) and (imp not in imports_base)):
+        if (imp not in imports_merged) and (imp not in imports_base):
             imports_merged.append(imp)
     return imports_merged
 
@@ -97,14 +93,14 @@ def get_merge_imports(base_file, local_file, remote_file):
 # TODO add the possibility to define ordering customs from a config file
 def set_import_groups(preset=None):
     """
-    Sets the prefered ordering for imports
+    Sets the preferred ordering for imports
     preset -- one of "android", "eclipse", "idea"
     """
     global IMPORT_GROUPS
-    if (preset != None):
+    if preset is not None:
         if preset in IMPORT_PRESETS:
-            IMPORT_GROUPS = sorted(
-                IMPORT_PRESETS[preset], key=lambda grp: len(grp[0]), reverse=True)
+            groups = IMPORT_PRESETS[preset]
+            IMPORT_GROUPS = sorted(groups, key=lambda grp: len(grp[0]), reverse=True)
 
 
 def get_import_group(imp):
@@ -113,7 +109,7 @@ def get_import_group(imp):
     imp -- the import line
     """
     for group in IMPORT_GROUPS:
-        if (imp.startswith(group[0])):
+        if imp.startswith(group[0]):
             return group[1]
     return len(IMPORT_GROUPS)
 
@@ -152,7 +148,7 @@ def apply_imports(filename, imports):
     # then rewrite the file
     with open(filename, 'w') as f:
         for line in content:
-            if (conflict):
+            if conflict:
                 conflict_content += line
                 if line.startswith(CONFLICT_END):
                     conflict = False
@@ -189,7 +185,7 @@ def has_merged_conflicts(merged_filename):
     conflict = False
     with open(merged_filename) as f:
         for line in f:
-            if (conflict):
+            if conflict:
                 if line.startswith(CONFLICT_END):
                     conflict = False
                 elif line.startswith(CONFLICT_SEP) or line.startswith(CONFLICT_BASE):
