@@ -1,0 +1,45 @@
+intro
+
+<<<<<<< local
+import foo
+import baz
+import bar
+|||||||
+import foo
+import baz
+import bar
+=======
+import foo
+import bar
+import bal
+>>>>>>> remote
+# Comment
+
+import abc
+import xyz
+
+Some random string
+
+# Comment, before the depends section
+
+depends eggs
+
+something else here...
+maybe we'll add something else before
+include titi
+include toto
+the next line ?
+
+<<<<<<< local
+Mixing import and non import conflicts...
+with another
+with dependencies
+|||||||
+Mixing import and non import conflicts
+with "another"
+with "dependency"
+=======
+Mixing import and non import conflicts !
+with "another.ext"
+with "dependency.ext"
+>>>>>>> remote

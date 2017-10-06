@@ -1,0 +1,25 @@
+intro
+
+import foo
+import bar
+import bal
+
+# Comment
+
+import abc
+import xyz
+
+Some random string
+
+# Comment, before the depends section
+
+depends eggs
+
+something else here...
+maybe we'll add something else before
+include toto
+the next line ?
+
+Mixing import and non import conflicts !
+with "another.ext"
+with "dependency.ext"

@@ -1,0 +1,24 @@
+intro
+
+import foo
+import baz
+import bar
+
+# Comment
+
+import abc
+import xyz
+
+Some random string
+
+# Comment, before the depends section
+
+depends eggs
+
+something else here...
+maybe we'll add something else before
+the next line ?
+
+Mixing import and non import conflicts
+with "another"
+with "dependency"
