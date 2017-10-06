@@ -3,7 +3,7 @@
 
 import unittest
 
-from amtlcs import *
+from amt_lcs import *
 
 
 class LCSTest(unittest.TestCase):

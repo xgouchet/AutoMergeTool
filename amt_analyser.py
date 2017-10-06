@@ -3,7 +3,7 @@
 
 import sys
 
-from amtutils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
+from amt_utils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
 
 
 class ConflictedFileAnalyser:
@@ -25,6 +25,7 @@ class ConflictedFileAnalyser:
                     return True
 
         return False
+
 
 if __name__ == '__main__':
     print("This is just a utility module, not to be launched directly.")

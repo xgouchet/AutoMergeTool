@@ -124,7 +124,7 @@ class ToolsLauncher:
     """
     """
 
-    def __init__(self, config: Optional[RawConfigParser] = None):
+    def __init__(self, config: Optional[RawConfigParser]=None):
         self.config = config
 
     @staticmethod

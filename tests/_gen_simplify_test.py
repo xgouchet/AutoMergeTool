@@ -5,7 +5,7 @@ import random
 import string
 import unittest
 
-from amtutils import Conflict
+from amt_utils import Conflict
 from gen_simplify import *
 
 

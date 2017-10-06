@@ -4,7 +4,7 @@
 import unittest
 from configparser import ConfigParser
 
-from amtlauncher import *
+from amt_launcher import *
 
 FAKE_TOOL = 'blu'
 FAKE_TOOL_SECTION = 'mergetool "blu"'

@@ -3,7 +3,7 @@
 
 import sys
 import argparse
-from amtutils import *
+from amt_utils import *
 
 
 def parse_arguments():

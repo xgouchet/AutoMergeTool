@@ -4,7 +4,7 @@
 import filecmp
 import unittest
 
-from amtutils import *
+from amt_utils import *
 
 CW_PATH = 'tests/data/conflict_walker/{0}.txt'
 

@@ -7,9 +7,9 @@ from argparse import ArgumentParser, Namespace
 from configparser import RawConfigParser
 from typing import Optional
 
-from amtanalyser import ConflictedFileAnalyser
-from amtlauncher import ToolsLauncher
-from amtutils import SUCCESSFUL_MERGE, ERROR_CONFLICTS, ERROR_EXTENSION, ERROR_INVOCATION, ERROR_NO_TOOL, ERROR_UNKNOWN
+from amt_analyser import ConflictedFileAnalyser
+from amt_launcher import ToolsLauncher
+from amt_utils import SUCCESSFUL_MERGE, ERROR_CONFLICTS, ERROR_EXTENSION, ERROR_INVOCATION, ERROR_NO_TOOL, ERROR_UNKNOWN
 
 # CONSTANTS
 GLOBAL_CONFIG = os.path.expanduser('~/.gitconfig')
@@ -88,7 +88,10 @@ def expand_arguments(cmd: str, args: Namespace) -> str:
     return cmd
 
 
-def merge(config: RawConfigParser, args: Namespace, launcher: ToolsLauncher, analyser: ConflictedFileAnalyser) -> int:
+def merge(config: RawConfigParser,
+          args: Namespace,
+          launcher: ToolsLauncher,
+          analyser: ConflictedFileAnalyser) -> int:
     """
     Handle the merge tools chain for the given argument
     config -- the current amt configuration
@@ -111,7 +114,10 @@ def merge(config: RawConfigParser, args: Namespace, launcher: ToolsLauncher, ana
     return merge_result
 
 
-def merge_with_tool(tool: str, config: RawConfigParser, args: Namespace, launcher: ToolsLauncher,
+def merge_with_tool(tool: str,
+                    config: RawConfigParser,
+                    args: Namespace,
+                    launcher: ToolsLauncher,
                     analyser: ConflictedFileAnalyser) -> int:
     """
     Run the given merge tool with the config and args

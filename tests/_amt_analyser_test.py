@@ -3,7 +3,7 @@
 
 import unittest
 
-from amtanalyser import *
+from amt_analyser import *
 
 CFA_PATH = 'tests/data/analyser/{0}.txt'
 

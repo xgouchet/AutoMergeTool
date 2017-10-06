@@ -5,7 +5,7 @@ import argparse
 import sys
 import re
 
-from amtutils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
+from amt_utils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
 
 IMPORT_REGEX = re.compile('^\s*import\s+(static\s+)?(.*)\s*;\s*$')
 PACKAGE_REGEX = re.compile('^\s*package\s+[\w][\w\.]+[\w].*$')

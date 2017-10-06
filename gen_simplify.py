@@ -4,8 +4,8 @@
 import argparse
 import sys
 
-from amtlcs import LCSAnalyser
-from amtutils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, CONFLICT_BASE, CONFLICT_SEP, \
+from amt_lcs import LCSAnalyser
+from amt_utils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, CONFLICT_BASE, CONFLICT_SEP, \
     ConflictsWalker
 
 

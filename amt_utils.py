@@ -23,7 +23,6 @@ ERROR_CONFLICTS = 4
 ERROR_UNTRUSTED = 5
 ERROR_INVOCATION = 6
 
-
 # TODO add docstrings for this file
 
 
@@ -79,8 +78,11 @@ class ConflictsWalker:
     and rewrite the merged file if needed
     """
 
-    def __init__(self, merged_path: str, report_name: Optional[str] = None, report_type: str = REPORT_NONE,
-                 verbose: bool = False):
+    def __init__(self,
+                 merged_path: str,
+                 report_name: Optional[str]=None,
+                 report_type: str=REPORT_NONE,
+                 verbose: bool=False):
         self.verbose = verbose
         self.log_tag = report_name
         self.conflicted = merged_path
@@ -157,7 +159,7 @@ class ConflictsWalker:
     def next_conflict(self) -> Conflict:
         return self.conflict
 
-    def end(self, apply: bool = True):
+    def end(self, apply: bool=True):
         self.conflicted_file.close()
         self.merged_file.close()
 
