@@ -25,17 +25,25 @@ class ImportsSolver(ABC):
                                local_path: str,
                                remote_path: str,
                                merged_path: str) -> bool:
+        """
+        Main method used to handle the conflicts in the given fileset
+        :param base_path: the base version path
+        :param local_path: the local version path
+        :param remote_path: the remote version path
+        :param merged_path: the merged version path
+        :return: whether the file is conflict-free
+        """
         # check if there are conflicts to resolve
-        if not (self.has_imports_conflicts(merged_path)):
+        if not (self.__has_imports_conflicts(merged_path)):
             print("No imports conflicts we can help with, ignored")
             return False
 
-        merged_imports = self.get_merge_imports(base_path, local_path, remote_path)
-        (section_start, section_end) = self.find_import_section_range(merged_path)
+        merged_imports = self.__get_merge_imports(base_path, local_path, remote_path)
+        (section_start, section_end) = self.__find_import_section_range(merged_path)
 
         return self.replace_imports_section(merged_path, merged_imports, section_start, section_end)
 
-    def has_imports_conflicts(self, merged_path: str) -> bool:
+    def __has_imports_conflicts(self, merged_path: str) -> bool:
         """
         Check if the given file has any conflicts in the imports section
         """
@@ -68,38 +76,50 @@ class ImportsSolver(ABC):
 
         return conflicts_with_imports > 0
 
-    def get_merge_imports(self, base_path: str, local_path: str, remote_path: str):
+    def __get_merge_imports(self, base_path: str, local_path: str, remote_path: str) -> List[str]:
         """
         Resolve the imports that should appear in the merged file
         base_path -- the path to the base file
         local_path -- the path to the local file
         remote_path -- the path to the remote file
         """
-        imports_base = self.read_imports(base_path)
-        imports_local = self.read_imports(local_path)
-        imports_remote = self.read_imports(remote_path)
+        imports_base = self.__read_imports(base_path)
+        imports_local = self.__read_imports(local_path)
+        imports_remote = self.__read_imports(remote_path)
+
+        return self.__merge_imports(imports_base, imports_local, imports_remote)
+
+    def __merge_imports(self, imp_base: List[str], imp_local: List[str],
+                        imp_remote: List[str]) -> List[str]:
+        """
+        Merge imports from various lists
+        :param imp_base: the base imports
+        :param imp_local: the local imports
+        :param imp_remote: the remote imports
+        :return: the merged imports list
+        """
         imports_merged = []
 
         # handle imports present in the three files
-        for imp in imports_base:
-            if (imp in imports_local) and (imp in imports_remote):
+        for imp in imp_base:
+            if (imp in imp_local) and (imp in imp_remote):
                 imports_merged.append(imp)
-                imports_local.remove(imp)
-                imports_remote.remove(imp)
+                imp_local.remove(imp)
+                imp_remote.remove(imp)
 
         # imports added in the local
-        for imp in imports_local:
-            if (imp not in imports_merged) and (imp not in imports_base):
+        for imp in imp_local:
+            if (imp not in imports_merged) and (imp not in imp_base):
                 imports_merged.append(imp)
 
         # imports added in the REMOTE
-        for imp in imports_remote:
-            if (imp not in imports_merged) and (imp not in imports_base):
+        for imp in imp_remote:
+            if (imp not in imports_merged) and (imp not in imp_base):
                 imports_merged.append(imp)
 
         return imports_merged
 
-    def read_imports(self, path: str) -> List[str]:
+    def __read_imports(self, path: str) -> List[str]:
         """
         Reads all imports from the given file and return them in a list
         filename -- the path to the file to read
@@ -112,7 +132,7 @@ class ImportsSolver(ABC):
                     imports.append(line)
         return sorted(imports)
 
-    def find_import_section_range(self, path: str) -> (int, int):
+    def __find_import_section_range(self, path: str) -> (int, int):
         section_start = -1
         last_import_in_section = -1
         in_conflict = False
@@ -150,7 +170,7 @@ class ImportsSolver(ABC):
 
         return section_start, last_import_in_section
 
-    def write_merged_imports(self, file: TextIOWrapper, imports: list):
+    def __write_merged_imports(self, file: TextIOWrapper, imports: list):
         """
         Sorts and write the given imports to the file, adding a blank line between
         each group
@@ -202,7 +222,7 @@ class ImportsSolver(ABC):
                             line.startswith(CONFLICT_START) or line.startswith(CONFLICT_START):
                         conflicts_remain = True
                 elif not merged_imports_written:
-                    self.write_merged_imports(f, merged_imports)
+                    self.__write_merged_imports(f, merged_imports)
                     merged_imports_written = True
 
         return not conflicts_remain
@@ -220,7 +240,9 @@ class ImportsSolver(ABC):
         """
         :param line: a single line from the source file
         :return: whether the line is a non import statement, but allowed within an import section
-        (eg: empty line, commented line)
+        (eg: empty line)
+        Note that those lines won't appear at all in the merged files, so if the user have comments in the import
+        section, you might want to not keep those
         """
         pass
 
