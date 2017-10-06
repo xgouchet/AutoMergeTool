@@ -21,7 +21,7 @@ OPT_VERBOSE = 'verbose'
 OPT_KEEP_REPORTS = 'keepReport'
 
 
-def parse_arguments() -> Namespace:
+def parse_arguments(args: list) -> Namespace:
     """
     Parses the arguments passed on invocation in a dict and return it
     """
@@ -33,7 +33,7 @@ def parse_arguments() -> Namespace:
     parser.add_argument('-m', '--merged', required=True)
 
     # convert to absolute path
-    parsed_arg = parser.parse_args()
+    parsed_arg = parser.parse_args(args)
 
     parsed_arg.base = os.path.abspath(parsed_arg.base)
     parsed_arg.local = os.path.abspath(parsed_arg.local)
@@ -210,7 +210,7 @@ def clean_reports(config: RawConfigParser, merged_path: str):
 
 
 if __name__ == '__main__':
-    cli_args = parse_arguments()
+    cli_args = parse_arguments(sys.argv)
 
     # noinspection PyUnresolvedReferences
     merged_file_path = cli_args.merged

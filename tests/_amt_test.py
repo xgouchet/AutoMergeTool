@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from unittest.mock import *
 from configparser import ConfigParser
+from unittest.mock import *
 
 from amt import *
 
@@ -292,6 +292,57 @@ class AMTTest(unittest.TestCase):
 
         # Then
         self.assertEqual(config, None)
+
+    def test_path_arguments_shorts(self):
+        # Given
+        b = "b"
+        l = "l"
+        r = "r"
+        m = "m"
+        base_path = os.path.abspath(os.getcwd())
+
+        # When
+        parsed = parse_arguments(['-b', b, '-m', m, '-l', l, '-r', r])
+
+        self.assertEqual(parsed.base, base_path + os.sep + b)
+        self.assertEqual(parsed.local, base_path + os.sep + l)
+        self.assertEqual(parsed.remote, base_path + os.sep + r)
+        self.assertEqual(parsed.merged, base_path + os.sep + m)
+
+    def test_path_arguments_long(self):
+        # Given
+        b = "b"
+        l = "l"
+        r = "r"
+        m = "m"
+        base_path = os.path.abspath(os.getcwd())
+
+        # When
+        parsed = parse_arguments(['--base', b, '--merged', m, '--local', l, '--remote', r])
+
+        self.assertEqual(parsed.base, base_path + os.sep + b)
+        self.assertEqual(parsed.local, base_path + os.sep + l)
+        self.assertEqual(parsed.remote, base_path + os.sep + r)
+        self.assertEqual(parsed.merged, base_path + os.sep + m)
+
+    def test_missing_arguments(self):
+        b = "b"
+        l = "l"
+        r = "r"
+        m = "m"
+
+        with self.assertRaises(SystemExit) as context:
+            parse_arguments(['--base', b, '--merged', m, '--remote', r])
+
+    def test_unknown_argument(self):
+        b = "b"
+        l = "l"
+        r = "r"
+        m = "m"
+
+        with self.assertRaises(SystemExit) as context:
+            parse_arguments(
+                ['--base', b, '--merged', m, '--local', l, '--remote', r, '--kamoulox', '-p'])
 
 
 def create_args():
