@@ -5,7 +5,7 @@ import unittest
 from filecmp import cmp
 from shutil import copyfile
 
-from amt_import_solver import *
+from automergetool.amt_import_solver import *
 
 IS_PATH = 'tests/data/import_solver/{0}.txt'
 

@@ -3,7 +3,7 @@
 
 import unittest
 
-from amt_lcs import *
+from automergetool.amt_lcs import *
 
 
 class LCSTest(unittest.TestCase):

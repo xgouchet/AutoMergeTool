@@ -4,7 +4,7 @@
 import filecmp
 import unittest
 
-from amt_utils import *
+from automergetool.amt_utils import *
 
 CW_PATH = 'tests/data/conflict_walker/{0}.txt'
 
@@ -27,7 +27,7 @@ class ConflictTest(unittest.TestCase):
 
         # Then check the output
         self.assertTrue(filecmp.cmp(walker.merged, file))
-        self.assertEqual(walker.get_merge_status(), SUCCESSFUL_MERGE)
+        self.assertEqual(walker.get_merge_status(), SUCCESS)
         os.remove(walker.merged)
 
     def test_single_conflict_unsolved(self):
@@ -82,7 +82,7 @@ class ConflictTest(unittest.TestCase):
 
         # Then check the output
         self.assertTrue(filecmp.cmp(walker.merged, CW_PATH.format('single_conflict_resolved')))
-        self.assertEqual(walker.get_merge_status(), SUCCESSFUL_MERGE)
+        self.assertEqual(walker.get_merge_status(), SUCCESS)
         os.remove(walker.merged)
 
     def test_three_conflicts_half_solved_with_full_report(self):

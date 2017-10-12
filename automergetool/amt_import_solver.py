@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from io import TextIOWrapper
 from typing import List
 
-from amt_utils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
+from automergetool.amt_utils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
 
 
 class ImportsSolver(ABC):

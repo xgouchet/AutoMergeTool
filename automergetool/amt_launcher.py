@@ -20,12 +20,12 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(CURRENT_FRAME))
 CURRENT_INTERPRETER = sys.executable
 
 KNOWN_PATHS = {  # type: Dict[str, str]
-    'java_imports': CURRENT_DIR + '/java_imports.py',
-    'gen_additions': CURRENT_DIR + '/gen_additions.py',
-    'gen_deletions': CURRENT_DIR + '/gen_deletions.py',
-    'gen_debug': CURRENT_DIR + '/gen_debug.py',
-    'gen_simplify': CURRENT_DIR + '/gen_simplify.py',
-    'gen_woven': CURRENT_DIR + '/gen_woven.py'
+    'java_imports': CURRENT_DIR + '/solvers/java_imports.py',
+    'gen_additions': CURRENT_DIR + '/solvers/gen_additions.py',
+    'gen_deletions': CURRENT_DIR + '/solvers/gen_deletions.py',
+    'gen_debug': CURRENT_DIR + '/solvers/gen_debug.py',
+    'gen_simplify': CURRENT_DIR + '/solvers/gen_simplify.py',
+    'gen_woven': CURRENT_DIR + '/solvers/gen_woven.py'
 }
 
 KNOWN_CMDS = {  # type: Dict[str, str]

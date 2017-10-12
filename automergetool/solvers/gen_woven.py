@@ -4,7 +4,7 @@
 import argparse
 import sys
 
-from amt_utils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, ConflictsWalker
+from automergetool.amt_utils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, ConflictsWalker
 
 
 def parse_arguments():

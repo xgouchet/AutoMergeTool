@@ -4,9 +4,10 @@
 import argparse
 import sys
 
-from amt_lcs import LCSAnalyser
-from amt_utils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, CONFLICT_BASE, CONFLICT_SEP, \
-    ConflictsWalker
+from automergetool.amt_utils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, CONFLICT_BASE, CONFLICT_SEP, \
+ ConflictsWalker
+
+from automergetool.amt_lcs import LCSAnalyser
 
 
 def parse_arguments():

@@ -3,7 +3,7 @@
 
 import unittest
 
-from amt_analyser import *
+from automergetool.amt_analyser import *
 
 CFA_PATH = 'tests/data/analyser/{0}.txt'
 

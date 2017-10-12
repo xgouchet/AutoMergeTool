@@ -7,9 +7,10 @@ from argparse import ArgumentParser, Namespace
 from configparser import RawConfigParser
 from typing import Optional
 
-from amt_analyser import ConflictedFileAnalyser
-from amt_launcher import ToolsLauncher
-from amt_utils import SUCCESSFUL_MERGE, ERROR_CONFLICTS, ERROR_EXTENSION, ERROR_INVOCATION, ERROR_NO_TOOL, ERROR_UNKNOWN
+from automergetool.amt_analyser import ConflictedFileAnalyser
+from automergetool.amt_launcher import ToolsLauncher
+from automergetool.amt_utils import SUCCESS, ERROR_CONFLICTS, ERROR_EXTENSION, ERROR_INVOCATION, ERROR_NO_TOOL, \
+    ERROR_UNKNOWN
 
 # CONSTANTS
 GLOBAL_CONFIG = os.path.expanduser('~/.gitconfig')
@@ -173,7 +174,7 @@ def merge_with_tool(tool: str,
         if invocation_result == 0:
             if verbose:
                 print(" [AMT] ✓ {0} merged successfully".format(tool))
-            return SUCCESSFUL_MERGE
+            return SUCCESS
         else:
             if verbose:
                 print(" [AMT] ✗ {0} didn't solve all conflicts".format(tool))
@@ -186,7 +187,7 @@ def merge_with_tool(tool: str,
         if has_remaining == 0:
             if verbose:
                 print(" [AMT] ✓ {0} merged successfully".format(tool))
-            return SUCCESSFUL_MERGE
+            return SUCCESS
         else:
             if verbose:
                 print(" [AMT] ✗ {0} didn't solve all conflicts".format(tool))
@@ -209,8 +210,8 @@ def clean_reports(config: RawConfigParser, merged_path: str):
             os.remove(os.path.join(dir_path, file))
 
 
-if __name__ == '__main__':
-    cli_args = parse_arguments(sys.argv)
+def run_main() -> int:
+    cli_args = parse_arguments(sys.argv[1:])
 
     # noinspection PyUnresolvedReferences
     merged_file_path = cli_args.merged
@@ -220,7 +221,11 @@ if __name__ == '__main__':
     conflict_analyser = ConflictedFileAnalyser()
     result = merge(merged_config, cli_args, tools_launcher, conflict_analyser)
 
-    if result == SUCCESSFUL_MERGE:
+    if result == SUCCESS:
         clean_reports(merged_config, merged_file_path)
 
-    sys.exit(result)
+    return result
+
+
+if __name__ == '__main__':
+    sys.exit(run_main())

@@ -5,8 +5,8 @@ import random
 import string
 import unittest
 
-from amt_utils import Conflict
-from gen_simplify import *
+from automergetool.amt_utils import Conflict
+from automergetool.solvers.gen_simplify import *
 
 
 class SolverTest(unittest.TestCase):

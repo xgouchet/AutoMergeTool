@@ -5,7 +5,8 @@ import unittest
 from configparser import ConfigParser
 from unittest.mock import *
 
-from amt import *
+from automergetool.amt import *
+from automergetool.amt_utils import *
 
 FAKE_TOOL = 'blu'
 FAKE_TOOL_SECTION = 'mergetool "blu"'
@@ -122,7 +123,7 @@ class AMTTest(unittest.TestCase):
         result = merge_with_tool(tool, cfg, args, launcher, analyser)
 
         # Then
-        self.assertEqual(result, SUCCESSFUL_MERGE)
+        self.assertEqual(result, SUCCESS)
         launcher.invoke.assert_called_with('MY_CMD ' + args.merged)
 
     def test_merge_with_tool_remaining_conflicts(self):
@@ -172,7 +173,7 @@ class AMTTest(unittest.TestCase):
         result = merge_with_tool(tool, cfg, args, launcher, analyser)
 
         # Then
-        self.assertEqual(result, SUCCESSFUL_MERGE)
+        self.assertEqual(result, SUCCESS)
         launcher.invoke.assert_called_with('MY_CMD ' + args.merged)
 
     def test_merge_with_tool_untrusted_unsolved(self):
@@ -249,7 +250,7 @@ class AMTTest(unittest.TestCase):
         result = merge(cfg, args, launcher, analyser)
 
         # Then
-        self.assertEqual(result, SUCCESSFUL_MERGE)
+        self.assertEqual(result, SUCCESS)
         launcher.invoke.assert_called_once_with('MY_CMD1 ' + args.merged)
 
     def test_merge_with_tools_empty(self):

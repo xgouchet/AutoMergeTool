@@ -15,7 +15,7 @@ REPORT_SOLVED = "solved"
 REPORT_UNSOLVED = "unsolved"
 REPORT_FULL = "full"
 
-SUCCESSFUL_MERGE = 0
+SUCCESS = 0
 ERROR_NO_TOOL = 1
 ERROR_EXTENSION = 2
 ERROR_UNKNOWN = 3
@@ -172,12 +172,12 @@ class ConflictsWalker:
     def get_merge_status(self) -> int:
         """
         Returns the global merge status to report
-        Either SUCCESSFUL_MERGE or one of the ERROR_xxx constants
+        Either SUCCESS or one of the ERROR_xxx constants
         """
         if self.has_remaining_conflicts:
             return ERROR_CONFLICTS
         else:
-            return SUCCESSFUL_MERGE
+            return SUCCESS
 
     def write_previous_conflict(self):
         """

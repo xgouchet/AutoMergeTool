@@ -15,6 +15,9 @@ coverage.xml
 *,cover
 .hypothesis/
 
+#SetupTool artifacts
+build/
+dist/
 
 # shell editor swap files
 *.swp

@@ -5,7 +5,7 @@ import argparse
 import re
 import sys
 
-from amt_import_solver import ImportsSolver
+from automergetool.amt_import_solver import ImportsSolver
 
 IMPORT_REGEX = re.compile('^\s*import\s+(static\s+)?(.*)\s*;\s*$')
 PACKAGE_REGEX = re.compile('^\s*package\s+[\w][\w\.]+[\w].*$')

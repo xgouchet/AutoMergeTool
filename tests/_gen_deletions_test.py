@@ -3,8 +3,8 @@
 
 import unittest
 
-from amt_utils import Conflict
-from gen_deletions import *
+from automergetool.amt_utils import Conflict
+from automergetool.solvers.gen_deletions import *
 
 
 class SolverTest(unittest.TestCase):

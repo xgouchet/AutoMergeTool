@@ -3,7 +3,7 @@
 
 import sys
 
-from amt_utils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
+from automergetool.amt_utils import CONFLICT_START, CONFLICT_SEP, CONFLICT_BASE, CONFLICT_END
 
 
 class ConflictedFileAnalyser:

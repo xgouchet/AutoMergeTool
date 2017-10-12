@@ -2,9 +2,11 @@
 
 > AutoMergeTool is a tool compatible with git to simplify the process of solving conflicts after a git merge, rebase or cherry-pick.
 
+[![Version](https://img.shields.io/badge/Version-0.2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Python-3.5-blue.svg)](https://docs.python.org/3/whatsnew/3.5.html)
-[![Build Status](https://travis-ci.org/xgouchet/AutoMergeTool.svg?branch=master)](https://travis-ci.org/xgouchet/AutoMergeTool) [![codecov](https://codecov.io/gh/xgouchet/AutoMergeTool/branch/master/graph/badge.svg)](https://codecov.io/gh/xgouchet/AutoMergeTool)
+[![Build Status](https://travis-ci.org/xgouchet/AutoMergeTool.svg?branch=master)](https://travis-ci.org/xgouchet/AutoMergeTool)
+[![Coverage](https://codecov.io/gh/xgouchet/AutoMergeTool/branch/master/graph/badge.svg)](https://codecov.io/gh/xgouchet/AutoMergeTool)
 
 AMT enables you to chain automatic solvers on git conflicts, before openning your preferred manual merge tool (meld, kdiff, winmerge, …). It is currently under active development, and used internally in the Deezer Android team.
 

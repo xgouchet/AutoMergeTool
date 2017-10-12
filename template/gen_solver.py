@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
 import argparse
-from amt_utils import *
+
+from automergetool.amt_utils import *
 
 
 def parse_arguments():
