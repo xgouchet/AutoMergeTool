@@ -18,6 +18,7 @@ coverage.xml
 #SetupTool artifacts
 build/
 dist/
+automergetool.egg-info/
 
 # shell editor swap files
 *.swp

@@ -5,9 +5,9 @@
 [![Version](https://img.shields.io/badge/Version-0.2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Python-3.5-blue.svg)](https://docs.python.org/3/whatsnew/3.5.html)
-[![Documentation Status](https://img.shields.io/badge/docs-0.2-brightgreen.svg)](http://automergetool.readthedocs.io/en/stable/?badge=0.2)
 
 
+[![Documentation Status](https://img.shields.io/badge/docs-0.2-brightgreen.svg)](http://automergetool.readthedocs.io/en/latest/?badge=0.2)
 [![Build Status](https://travis-ci.org/xgouchet/AutoMergeTool.svg?branch=master)](https://travis-ci.org/xgouchet/AutoMergeTool)
 [![Coverage](https://codecov.io/gh/xgouchet/AutoMergeTool/branch/master/graph/badge.svg)](https://codecov.io/gh/xgouchet/AutoMergeTool)
 
