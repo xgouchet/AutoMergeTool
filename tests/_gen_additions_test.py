@@ -13,7 +13,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", '', "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda conflict: ORDER_LOCAL_FIRST)
+        handle_conflict(conflict, lambda _c: ORDER_LOCAL_FIRST)
 
         # Then check the conflict is resolved
         self.assertTrue(conflict.is_resolved())
@@ -24,7 +24,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", '', "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda conflict: ORDER_REMOTE_FIRST)
+        handle_conflict(conflict, lambda _c: ORDER_REMOTE_FIRST)
 
         # Then check the conflict is resolved
         self.assertTrue(conflict.is_resolved())
@@ -35,7 +35,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", '', "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda conflict: ORDER_LOCAL_ONLY)
+        handle_conflict(conflict, lambda _c: ORDER_LOCAL_ONLY)
 
         # Then check the conflict is resolved
         self.assertTrue(conflict.is_resolved())
@@ -46,7 +46,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", '', "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda conflict: ORDER_REMOTE_ONLY)
+        handle_conflict(conflict, lambda _c: ORDER_REMOTE_ONLY)
 
         # Then check the conflict is resolved
         self.assertTrue(conflict.is_resolved())
@@ -57,7 +57,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", '', "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda conflict: ORDER_NONE)
+        handle_conflict(conflict, lambda _c: ORDER_NONE)
 
         # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
@@ -68,7 +68,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", "spam\n", "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda conflict: ORDER_REMOTE_FIRST)
+        handle_conflict(conflict, lambda _c: ORDER_REMOTE_FIRST)
 
         # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
@@ -79,7 +79,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", "spam\n", "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda conflict: ORDER_REMOTE_FIRST, True)
+        handle_conflict(conflict, lambda _c: ORDER_REMOTE_FIRST, True)
 
         # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
@@ -90,7 +90,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", " \n\t \n \n\n \n", "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda conflict: ORDER_REMOTE_FIRST, True)
+        handle_conflict(conflict, lambda _c: ORDER_REMOTE_FIRST, True)
 
         # Then check the conflict is resolved
         self.assertTrue(conflict.is_resolved())
@@ -101,7 +101,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", " \n\t\n\n \n", "baz\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda c: ORDER_REMOTE_FIRST, False)
+        handle_conflict(conflict, lambda _c: ORDER_REMOTE_FIRST, False)
 
         # Then check the conflict is not resolved
         self.assertFalse(conflict.is_resolved())
@@ -112,7 +112,7 @@ class SolverTest(unittest.TestCase):
         conflict = fake_conflict("foo\n", "", "foo\n")
 
         # When handling the conflict
-        handle_conflict(conflict, lambda c: ORDER_REMOTE_FIRST, False)
+        handle_conflict(conflict, lambda _c: ORDER_REMOTE_FIRST, False)
 
         # Then check the conflict is not resolved
         self.assertTrue(conflict.is_resolved())

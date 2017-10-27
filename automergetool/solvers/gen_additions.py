@@ -37,7 +37,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def is_same_addition(local, remote):
+def is_same_addition(local: str, remote: str):
     # TODO allow some margin of error in this check (different whitespace, comments...)
     return local == remote
 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     args = parse_arguments()
     walker = ConflictsWalker(args.merged, 'adds', args.report, args.verbose)
     while walker.has_more_conflicts():
-        handle_conflict(walker.next_conflict(), lambda conflict: get_order(conflict, args.order),
+        handle_conflict(walker.next_conflict(), lambda c: get_order(c, args.order),
                         args.whitespace)
     walker.end()
     sys.exit(walker.get_merge_status())

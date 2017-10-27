@@ -25,7 +25,8 @@ KNOWN_PATHS = {  # type: Dict[str, str]
     'gen_deletions': CURRENT_DIR + '/solvers/gen_deletions.py',
     'gen_debug': CURRENT_DIR + '/solvers/gen_debug.py',
     'gen_simplify': CURRENT_DIR + '/solvers/gen_simplify.py',
-    'gen_woven': CURRENT_DIR + '/solvers/gen_woven.py'
+    'gen_woven': CURRENT_DIR + '/solvers/gen_woven.py',
+    'gen_single_line': CURRENT_DIR + '/solvers/gen_single_line.py'
 }
 
 KNOWN_CMDS = {  # type: Dict[str, str]
@@ -89,6 +90,7 @@ KNOWN_CMDS = {  # type: Dict[str, str]
     'gen_debug': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_simplify': CURRENT_INTERPRETER + ' {0} -m $MERGED',
     'gen_woven': CURRENT_INTERPRETER + ' {0} -m $MERGED',
+    'gen_single_line': CURRENT_INTERPRETER + ' {0} -m $MERGED',
 
     # Language specific AMT solvers
     'java_imports': CURRENT_INTERPRETER + ' {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED'

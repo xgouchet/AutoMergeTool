@@ -70,6 +70,19 @@ You can add the following options :
 -  **mergetool.gen\_deletions.verbose** : when set to true, logs this
    solver's process in the console output.
 
+Single Line Conflicts (``gen_single_line``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This tool will handle any conflict where a single line was modified
+both in the local and remote versions, but in different places in the line.
+
+You can add the following options :
+
+-  **mergetool.gen\_single\_line.report** : sets the type of report (cf
+   `Conflict Reports <reporting>`__)
+-  **mergetool.gen\_single\_line.verbose** : when set to true, logs this
+   solver's process in the console output.
+
 Internal (Language specific)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
