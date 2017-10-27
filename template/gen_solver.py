@@ -22,7 +22,7 @@ def parse_arguments():
 
 
 def handle_conflict(conflict):
-    """Handle a conflicts where the changes are woven"""
+    """Handle a conflicts here"""
     # get each side's content
     base = conflict.base
     local = conflict.local
