@@ -4,10 +4,10 @@
 import argparse
 import sys
 
-from automergetool.amt_utils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, CONFLICT_BASE, CONFLICT_SEP, \
- ConflictsWalker
-
-from automergetool.amt_lcs import LCSAnalyser
+from automergetool.amt_lcs import LCSAnalyser, ListSequencer
+from automergetool.amt_utils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, CONFLICT_BASE, \
+    CONFLICT_SEP, \
+    ConflictsWalker
 
 
 def parse_arguments():
@@ -42,7 +42,7 @@ def handle_conflict(conflict):
         return
 
     # find common lines
-    analyser = LCSAnalyser(concatenate=lambda a, b: list(a) + list(b))
+    analyser = LCSAnalyser(ListSequencer())
     result = analyser.lcs(base=lines_base, left=lines_local, right=lines_remote)
 
     if len(result) == 0:
