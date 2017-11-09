@@ -17,7 +17,15 @@ AMT enables you to chain automatic solvers on git conflicts, before openning you
 
 ## Installation
 
-**TL;DR;** The easiest way to install AMT is to [download](https://github.com/xgouchet/AutoMergeTool/archive/master.zip) or clone the archive somewhere, then include the following inside your `~/.gitconfig` file : 
+**TL;DR;** The easiest way to install AMT is to use `pip`:
+
+```$ pip install automergetool```
+
+… or using `easy\_install`:
+
+```$ easy_install automergetool```
+
+Then include the following inside your `~/.gitconfig` file :
 
     [merge]
         tool = amt
@@ -29,7 +37,7 @@ AMT enables you to chain automatic solvers on git conflicts, before openning you
 
 **Prerequisite** : AutoMergeTool requires Python 3.5, and won't work with Python 2.x.
 
-You can also read the documentation for [installation](https://github.com/xgouchet/AutoMergeTool/wiki/Installation) and [configuration](https://github.com/xgouchet/AutoMergeTool/wiki/Configuration) instructions.
+You can also read the documentation for [installation](http://automergetool.readthedocs.io/en/stable/installation.html) and [configuration](http://automergetool.readthedocs.io/en/stable/configuration.html) instructions.
 
 ## Usage example
 
