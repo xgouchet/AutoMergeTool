@@ -17,8 +17,9 @@ class ImportsSolver(ABC):
     assuming that import statements are always on a single line, and are grouped in the source file.
     """
 
-    def __init__(self):
+    def __init__(self, deep_merge: bool = False):
         super().__init__()
+        self.deep_merge = deep_merge
 
     def solve_import_conflicts(self,
                                base_path: str,
@@ -41,7 +42,7 @@ class ImportsSolver(ABC):
         merged_imports = self.__get_merge_imports(base_path, local_path, remote_path)
         (section_start, section_end) = self.__find_import_section_range(merged_path)
 
-        return self.replace_imports_section(merged_path, merged_imports, section_start, section_end)
+        return self.__replace_imports_section(merged_path, merged_imports, section_start, section_end)
 
     def __has_imports_conflicts(self, merged_path: str) -> bool:
         """
@@ -87,10 +88,16 @@ class ImportsSolver(ABC):
         imports_local = self.__read_imports(local_path)
         imports_remote = self.__read_imports(remote_path)
 
-        return self.__merge_imports(imports_base, imports_local, imports_remote)
+        if self.deep_merge:
+            return self.__merge_imports_deep(imports_base, imports_local, imports_remote)
+        else:
+            return self.__merge_imports_shallow(imports_base, imports_local, imports_remote)
 
-    def __merge_imports(self, imp_base: List[str], imp_local: List[str],
-                        imp_remote: List[str]) -> List[str]:
+    # noinspection PyMethodMayBeStatic
+    def __merge_imports_deep(self,
+                             imp_base: List[str],
+                             imp_local: List[str],
+                             imp_remote: List[str]) -> List[str]:
         """
         Merge imports from various lists
         :param imp_base: the base imports
@@ -119,6 +126,48 @@ class ImportsSolver(ABC):
 
         return imports_merged
 
+    # noinspection PyMethodMayBeStatic
+    def __merge_imports_shallow(self,
+                                imp_base: List[str],
+                                imp_local: List[str],
+                                imp_remote: List[str]) -> List[str]:
+        """
+        Merge imports from various lists
+        :param imp_base: the base imports
+        :param imp_local: the local imports
+        :param imp_remote: the remote imports
+        :return: the merged imports list
+        """
+        imports_merged = []
+
+        # handle imports present in the three files
+        for imp in imp_base:
+            if (imp in imp_local) and (imp in imp_remote):
+                imports_merged.append(imp)
+                imp_local.remove(imp)
+                imp_remote.remove(imp)
+
+        # imports added in the local
+        for imp in imp_local:
+            if (imp not in imports_merged) and (imp not in imp_base):
+                imports_merged.append(imp)
+
+        # imports added in the REMOTE
+        for imp in imp_remote:
+            if (imp not in imports_merged) and (imp not in imp_base):
+                imports_merged.append(imp)
+
+        return imports_merged
+
+    def __is_in_imports(self, imp: str, imports: List[str]) -> bool:
+        for test_imp in imports:
+            if self.are_imports_the_same(imp, test_imp):
+                if self.are_imports_equals(imp, test_imp):
+                    return True
+                else:
+                    raise RuntimeError("✗ Imports conflict between\n" + imp + "\n and\n" + test_imp)
+        return False
+
     def __read_imports(self, path: str) -> List[str]:
         """
         Reads all imports from the given file and return them in a list
@@ -138,7 +187,6 @@ class ImportsSolver(ABC):
         in_conflict = False
         in_section = False
         conflict_start = 0
-        conflict_content = ""
         conflict_has_imports = False
 
         with open(path) as f:
@@ -165,7 +213,6 @@ class ImportsSolver(ABC):
                             section_start = i
                         last_import_in_section = i
                     elif in_section and not self.is_allowed_within_import_section(line):
-                        section_end = i - 1
                         break
 
         return section_start, last_import_in_section
@@ -177,7 +224,7 @@ class ImportsSolver(ABC):
         f -- the file object (needs write permission)
         imports -- the list of imports
         """
-        sorted_imports = self.sort_imports(imports)
+        sorted_imports = self.__sort_imports(imports)
         previous_group = -1
         for imp in sorted_imports:
             group = self.get_import_group(imp)
@@ -187,18 +234,18 @@ class ImportsSolver(ABC):
                 previous_group = group
             file.write(imp)
 
-    def sort_imports(self, imports: list) -> list:
+    def __sort_imports(self, imports: list) -> list:
         """
         :param imports: the list of imports to sort
         :return: a list with the same imports, sorted as necessary
         """
         return sorted(sorted(imports), key=lambda imp: self.get_import_group(imp))
 
-    def replace_imports_section(self,
-                                merged_path: str,
-                                merged_imports: list,
-                                section_start: int,
-                                section_end: int) -> bool:
+    def __replace_imports_section(self,
+                                  merged_path: str,
+                                  merged_imports: list,
+                                  section_start: int,
+                                  section_end: int) -> bool:
         """
         Rewrites the given file, replacing the import section with the merged imports
         :param merged_path: the path of the file to rewrite
@@ -226,6 +273,26 @@ class ImportsSolver(ABC):
                     merged_imports_written = True
 
         return not conflicts_remain
+
+    # noinspection PyMethodMayBeStatic
+    def are_imports_the_same(self, imp: str, other_imp: str) -> bool:
+        """
+        :param imp: an import statement
+        :param other_imp: another import statement
+        :return: true if both statements imports the same logical element, even if they have differences (different
+        aliases, ...)
+        """
+        return imp == other_imp
+
+    # noinspection PyMethodMayBeStatic
+    def are_imports_equals(self, imp: str, other_imp: str) -> bool:
+        """
+        :param imp: an import statement
+        :param other_imp: another import statement
+        :return: true if both statements imports the same logical element, with no logical differnence (same alias...)
+        When invoked, inputs are guaranteed to represent the same import (are_imports_the_same returned true)
+        """
+        return imp == other_imp
 
     @abstractmethod
     def is_import_line(self, line: str) -> bool:

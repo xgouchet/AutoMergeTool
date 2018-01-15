@@ -32,7 +32,7 @@ IMPORT_PRESETS = {
 
 class JavaImportSolver(ImportsSolver):
     # TODO allow custom order configuration
-    def __init__(self, order: str=None):
+    def __init__(self, order: str = None):
         super().__init__()
         if order is not None:
             self.set_import_groups(order)
@@ -48,7 +48,7 @@ class JavaImportSolver(ImportsSolver):
     def is_import_line(self, line: str) -> bool:
         return re.match(IMPORT_REGEX, line) is not None
 
-    def set_import_groups(self, preset: str=None):
+    def set_import_groups(self, preset: str = None):
         """
         Sets the preferred ordering for imports
         preset -- one of "android", "eclipse", "idea"
@@ -67,6 +67,27 @@ class JavaImportSolver(ImportsSolver):
             if imp.startswith(group[0]):
                 return group[1]
         return len(self.import_groups)
+
+    def are_imports_the_same(self, imp: str, other_imp: str):
+        match = re.match(IMPORT_REGEX, imp)
+        other_match = re.match(IMPORT_REGEX, other_imp)
+
+        canonical = match.group(2).replace(" ", "").replace("\t", "")
+        other_canonical = other_match.group(2).replace(" ", "").replace("\t", "")
+
+        if match.group(1) is not None:
+            static = match.group(1).replace(" ", "").replace("\t", "")
+        else :
+            static = ""
+        if other_match.group(1) is not None:
+            other_static = other_match.group(1).replace(" ", "").replace("\t", "")
+        else:
+            other_static = ""
+
+        return (canonical == other_canonical) and (static == other_static)
+
+    def are_imports_equals(self, imp: str, other_imp: str):
+        return True
 
 
 def parse_arguments():
