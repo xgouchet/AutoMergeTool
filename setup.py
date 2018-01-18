@@ -16,7 +16,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='automergetool',
-    version='0.2.0',
+    version='0.3.0',
     description='A tool to simplify the process of solving conflicts after a git merge, rebase or cherry-pick.',
     long_description=readme,
     author='Xavier F. Gouchet',

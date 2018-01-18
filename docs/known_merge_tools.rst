@@ -90,10 +90,22 @@ JavaImports (``java_imports``)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This tool will handle any conflict within the imports section of your
-java files.
+Java files.
 
 You can add the following options :
 
 -  **mergetool.java\_imports.order** : specify the way to order imports.
    Presets include Android Studio : ``android``; IntelliJ Idea :
    ``idea``; and Eclipse : ``eclipse``
+
+KotlinImports (``kotlin_imports_beta``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This tool (still in βeta) will handle any conflict within the imports section of your
+Kotlin files.
+
+You can add the following options :
+
+-  **mergetool.java\_imports.order** : specify the way to order imports.
+   Presets include Android Studio : ``android``; and IntelliJ Idea :
+   ``idea``
