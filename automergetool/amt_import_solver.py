@@ -162,10 +162,10 @@ class ImportsSolver(ABC):
     def __is_in_imports(self, imp: str, imports: List[str]) -> bool:
         for test_imp in imports:
             if self.are_imports_the_same(imp, test_imp):
-                if self.are_imports_equals(imp, test_imp):
-                    return True
-                else:
+                if self.are_imports_incompatible(imp, test_imp):
                     raise RuntimeError("✗ Imports conflict between\n" + imp + "\n and\n" + test_imp)
+                else:
+                    return True
         return False
 
     def __read_imports(self, path: str) -> List[str]:
@@ -285,14 +285,14 @@ class ImportsSolver(ABC):
         return imp == other_imp
 
     # noinspection PyMethodMayBeStatic
-    def are_imports_equals(self, imp: str, other_imp: str) -> bool:
+    def are_imports_incompatible(self, imp: str, other_imp: str) -> bool:
         """
         :param imp: an import statement
         :param other_imp: another import statement
-        :return: true if both statements imports the same logical element, with no logical differnence (same alias...)
+        :return: true if both statements imports the same logical element, with incompatible logical differnence (same alias...)
         When invoked, inputs are guaranteed to represent the same import (are_imports_the_same returned true)
         """
-        return imp == other_imp
+        return False
 
     @abstractmethod
     def is_import_line(self, line: str) -> bool:

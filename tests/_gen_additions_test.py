@@ -188,6 +188,79 @@ class SolverTest(unittest.TestCase):
         # Then check the order is correct
         self.assertEqual(order, ORDER_NONE)
 
+    # noinspection PyUnresolvedReferences
+    def test_path_arguments_shorts(self):
+        # Given
+        m = "m"
+        o = ORDER_REMOTE_FIRST
+        r = REPORT_UNSOLVED
+
+        # When
+        parsed = parse_arguments(['-m', m, '-o', o, '-r', r, '-v', '-w'])
+
+        self.assertEqual(parsed.merged, m)
+        self.assertEqual(parsed.order, o)
+        self.assertEqual(parsed.report, r)
+        self.assertEqual(parsed.verbose, True)
+        self.assertEqual(parsed.whitespace, True)
+
+    # noinspection PyUnresolvedReferences
+    def test_path_arguments_long(self):
+        # Given
+        r = REPORT_FULL
+        m = "m"
+        o = ORDER_LOCAL_FIRST
+
+        # When
+        parsed = parse_arguments(['--order', o, '--merged', m, '--verbose', '--report', r, '--whitespace'])
+
+        self.assertEqual(parsed.merged, m)
+        self.assertEqual(parsed.order, o)
+        self.assertEqual(parsed.report, r)
+        self.assertEqual(parsed.verbose, True)
+        self.assertEqual(parsed.whitespace, True)
+
+    # noinspection PyUnresolvedReferences
+    def test_path_arguments_with_defaults(self):
+        # Given
+        m = "m"
+
+        # When
+        parsed = parse_arguments(['--merged', m])
+
+        self.assertEqual(parsed.merged, m)
+        self.assertEqual(parsed.order, ORDER_ASK)
+        self.assertEqual(parsed.report, REPORT_NONE)
+        self.assertEqual(parsed.verbose, False)
+        self.assertEqual(parsed.whitespace, False)
+
+    def test_missing_arguments(self):
+        r = REPORT_NONE
+
+        with self.assertRaises(SystemExit) as context:
+            parse_arguments(['--report', r])
+
+    def test_unknown_argument(self):
+        r = REPORT_SOLVED
+        m = "m"
+
+        with self.assertRaises(SystemExit) as context:
+            parsed = parse_arguments(['-m', m, '-r', r, '--kamoulox', "foo"])
+
+    def test_invalid_order_argument(self):
+        o = "kamoulox"
+        m = "m"
+
+        with self.assertRaises(SystemExit) as context:
+            parsed = parse_arguments(['-m', m, '-o', o])
+
+    def test_invalid_report_argument(self):
+        r = "r"
+        m = "m"
+
+        with self.assertRaises(SystemExit) as context:
+            parsed = parse_arguments(['-m', m, '-r', r])
+
 
 def fake_conflict(local, base, remote):
     return Conflict(local, base, remote, "<<<<<<<\n", ">>>>>>>\n")

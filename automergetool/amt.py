@@ -164,9 +164,9 @@ def merge_with_tool(tool: str,
     try:
         invocation_result = launcher.invoke(cmd)
     except Exception as err:
-        invocation_result = ERROR_INVOCATION
         if verbose:
             print(" [AMT] ✗ {0} error running command {1}\n $ {2}".format(tool, err, cmd))
+        return ERROR_INVOCATION
 
     # Check result
     trust_exit_code = launcher.get_tool_trust(tool)

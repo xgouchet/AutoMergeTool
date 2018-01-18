@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import argparse
+from argparse import ArgumentParser, Namespace
 import sys
 
 from automergetool.amt_utils import REPORT_NONE, REPORT_SOLVED, REPORT_UNSOLVED, REPORT_FULL, ConflictsWalker
@@ -14,16 +14,16 @@ ORDER_ASK = "ask"
 ORDER_NONE = ""
 
 
-def parse_arguments():
+def parse_arguments(args: list) -> Namespace:
     """Parses the arguments passed on invocation in a dict and return it"""
-    parser = argparse.ArgumentParser(description="A tool to resolve addition conflicts")
+    parser = ArgumentParser(description="A tool to resolve addition conflicts")
 
     parser.add_argument('-m', '--merged', required=True)
     parser.add_argument(
         '-o',
         '--order',
         choices=[ORDER_LOCAL_FIRST, ORDER_REMOTE_FIRST, ORDER_ASK],
-        default=ORDER_REMOTE_FIRST,
+        default=ORDER_ASK,
         required=False)
     parser.add_argument(
         '-r',
@@ -34,7 +34,7 @@ def parse_arguments():
     parser.add_argument('-w', '--whitespace', required=False, action='store_true')
     parser.add_argument('-v', '--verbose', required=False, action='store_true')
 
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def is_same_addition(local: str, remote: str):
@@ -99,7 +99,7 @@ def get_order(conflict, choice, user_input=lambda msg: input(msg)):
 
 
 if __name__ == '__main__':
-    args = parse_arguments()
+    args = parse_arguments(sys.argv[1:])
     walker = ConflictsWalker(args.merged, 'adds', args.report, args.verbose)
     while walker.has_more_conflicts():
         handle_conflict(walker.next_conflict(), lambda c: get_order(c, args.order),
