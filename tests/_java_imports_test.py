@@ -5,8 +5,30 @@ import unittest
 
 from automergetool.solvers.java_imports import *
 
+JI_PATH = 'tests/data/java_imports/{0}.java'
+
 
 class SolverTest(unittest.TestCase):
+    def test_is_import(self):
+        """Test matching imports"""
+        # Given a Java Solver and imports
+        solver = JavaImportSolver()
+
+        path = JI_PATH.format("imports_only")
+        with open(path) as f:
+            for line in f:
+                self.assertTrue(solver.is_import_line(line))
+
+    def test_is_not_import(self):
+        """Test non matching imports"""
+        # Given a Java Solver and imports
+        solver = JavaImportSolver()
+
+        path = JI_PATH.format("no_imports")
+        with open(path) as f:
+            for line in f:
+                self.assertFalse(solver.is_import_line(line))
+
     def test_compare_imports(self):
         """Test comparing java imports"""
         # Given a Java Solver
@@ -16,11 +38,11 @@ class SolverTest(unittest.TestCase):
 
         # When handling the conflict
         same = solver.are_imports_the_same(fake_import, other_fake_import)
-        equal = solver.are_imports_equals(fake_import, other_fake_import)
+        incompatible = solver.are_imports_incompatible(fake_import, other_fake_import)
 
         # Then check the comparison
         self.assertTrue(same)
-        self.assertTrue(equal)
+        self.assertFalse(incompatible)
 
     def test_compare_different_imports(self):
         """Test comparing java imports"""
@@ -44,11 +66,11 @@ class SolverTest(unittest.TestCase):
 
         # When handling the conflict
         same = solver.are_imports_the_same(fake_import, other_fake_import)
-        equal = solver.are_imports_equals(fake_import, other_fake_import)
+        incompatible = solver.are_imports_incompatible(fake_import, other_fake_import)
 
         # Then check the comparison
         self.assertTrue(same)
-        self.assertTrue(equal)
+        self.assertFalse(incompatible)
 
     def test_compare_different_static_imports(self):
         """Test comparing java imports"""
@@ -62,6 +84,57 @@ class SolverTest(unittest.TestCase):
 
         # Then check the comparison
         self.assertFalse(same)
+
+    # noinspection PyUnresolvedReferences
+    def test_path_arguments_shorts(self):
+        # Given
+        b = "b"
+        l = "l"
+        r = "r"
+        m = "m"
+
+        # When
+        parsed = parse_arguments(['-b', b, '-m', m, '-l', l, '-r', r])
+
+        self.assertEqual(parsed.base, b)
+        self.assertEqual(parsed.local, l)
+        self.assertEqual(parsed.remote, r)
+        self.assertEqual(parsed.merged, m)
+
+    # noinspection PyUnresolvedReferences
+    def test_path_arguments_long(self):
+        # Given
+        b = "b"
+        l = "l"
+        r = "r"
+        m = "m"
+
+        # When
+        parsed = parse_arguments(['--base', b, '--merged', m, '--local', l, '--remote', r])
+
+        self.assertEqual(parsed.base, b)
+        self.assertEqual(parsed.local, l)
+        self.assertEqual(parsed.remote, r)
+        self.assertEqual(parsed.merged, m)
+
+    def test_missing_arguments(self):
+        b = "b"
+        l = "l"
+        r = "r"
+        m = "m"
+
+        with self.assertRaises(SystemExit) as context:
+            parse_arguments(['--base', b, '--merged', m, '--remote', r])
+
+    def test_unknown_argument(self):
+        b = "b"
+        l = "l"
+        r = "r"
+        m = "m"
+
+        with self.assertRaises(SystemExit) as context:
+            parse_arguments(
+                ['--base', b, '--merged', m, '--local', l, '--remote', r, '--kamoulox', '-p'])
 
 
 if __name__ == '__main__':

@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import argparse
+from argparse import ArgumentParser, Namespace
 import re
 import sys
 
 from automergetool.amt_import_solver import ImportsSolver
 
 IMPORT_REGEX = re.compile('^\s*import\s+(static\s+)?(.*)\s*;\s*$')
-PACKAGE_REGEX = re.compile('^\s*package\s+[\w][\w\.]+[\w].*$')
 EMPTY_REGEX = re.compile('^[\s\n]*$')
 
 IMPORT_GROUPS_ORDER_ANDROID = [("import android.", 0), ("import com.", 1), ("import junit.", 2),
@@ -77,7 +76,7 @@ class JavaImportSolver(ImportsSolver):
 
         if match.group(1) is not None:
             static = match.group(1).replace(" ", "").replace("\t", "")
-        else :
+        else:
             static = ""
         if other_match.group(1) is not None:
             other_static = other_match.group(1).replace(" ", "").replace("\t", "")
@@ -86,13 +85,10 @@ class JavaImportSolver(ImportsSolver):
 
         return (canonical == other_canonical) and (static == other_static)
 
-    def are_imports_equals(self, imp: str, other_imp: str):
-        return True
 
-
-def parse_arguments():
+def parse_arguments(args: list) -> Namespace:
     """Parses the arguments passed on invocation in a dict and return it"""
-    parser = argparse.ArgumentParser(description="A tool to combine multiple merge tools")
+    parser = ArgumentParser(description="A tool to combine multiple merge tools")
 
     parser.add_argument('-b', '--base', required=True)
     parser.add_argument('-l', '--local', required=True)
@@ -101,11 +97,11 @@ def parse_arguments():
     parser.add_argument(
         '-o', '--order', choices=[ORDER_ECLIPSE, ORDER_IJ_IDEA, ORDER_ANDROID], required=False)
 
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 if __name__ == '__main__':
-    args = parse_arguments()
+    args = parse_arguments(sys.argv[1:])
 
     solver = JavaImportSolver(args.order)
     if solver.solve_import_conflicts(args.base, args.local, args.remote, args.merge):
