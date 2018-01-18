@@ -21,6 +21,7 @@ CURRENT_INTERPRETER = sys.executable
 
 KNOWN_PATHS = {  # type: Dict[str, str]
     'java_imports': CURRENT_DIR + '/solvers/java_imports.py',
+    'kotlin_imports_beta': CURRENT_DIR + '/solvers/kotlin_imports.py',
     'gen_additions': CURRENT_DIR + '/solvers/gen_additions.py',
     'gen_deletions': CURRENT_DIR + '/solvers/gen_deletions.py',
     'gen_debug': CURRENT_DIR + '/solvers/gen_debug.py',
@@ -93,7 +94,8 @@ KNOWN_CMDS = {  # type: Dict[str, str]
     'gen_single_line': CURRENT_INTERPRETER + ' {0} -m $MERGED',
 
     # Language specific AMT solvers
-    'java_imports': CURRENT_INTERPRETER + ' {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED'
+    'java_imports': CURRENT_INTERPRETER + ' {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED',
+    'kotlin_imports_beta': CURRENT_INTERPRETER + ' {0} -b $BASE -l $LOCAL -r $REMOTE -m $MERGED'
 }
 
 KNOWN_TRUSTS = {  # type: Dict[str, bool]]
@@ -113,20 +115,24 @@ KNOWN_TRUSTS = {  # type: Dict[str, bool]]
 
     # AMT solvers
     'java_imports': True,
+    'kotlin_imports_beta': True,
     'gen_additions': True,
     'gen_woven': True,
     'gen_debug': True,
     'gen_simplify': True
 }
 
-KNOWN_EXTENSIONS = {'java_imports': 'java'}  # type: Dict[str, str]
+KNOWN_EXTENSIONS = {  # type: Dict[str, str]
+    'java_imports': 'java',
+    'kotlin_imports_beta': 'kt'
+}
 
 
 class ToolsLauncher:
     """
     """
 
-    def __init__(self, config: Optional[RawConfigParser]=None):
+    def __init__(self, config: Optional[RawConfigParser] = None):
         self.config = config
 
     @staticmethod
