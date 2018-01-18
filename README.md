@@ -2,7 +2,7 @@
 
 > AutoMergeTool is a tool compatible with git to simplify the process of solving conflicts after a git merge, rebase or cherry-pick.
 
-[![Version](https://img.shields.io/badge/Version-0.3.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Version](https://img.shields.io/badge/Version-0.3.0-blue.svg)](https://github.com/xgouchet/AutoMergeTool)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Python-3.5-blue.svg)](https://docs.python.org/3/whatsnew/3.5.html)
 
@@ -12,8 +12,6 @@
 [![Coverage](https://codecov.io/gh/xgouchet/AutoMergeTool/branch/master/graph/badge.svg)](https://codecov.io/gh/xgouchet/AutoMergeTool)
 
 AMT enables you to chain automatic solvers on git conflicts, before openning your preferred manual merge tool (meld, kdiff, winmerge, …). It is currently under active development, and used internally in the Deezer Android team.
-
-
 
 ## Installation
 
@@ -38,6 +36,8 @@ Then include the following inside your `~/.gitconfig` file :
 **Prerequisite** : AutoMergeTool requires Python 3.5, and won't work with Python 2.x.
 
 You can also read the documentation for [installation](http://automergetool.readthedocs.io/en/stable/installation.html) and [configuration](http://automergetool.readthedocs.io/en/stable/configuration.html) instructions.
+
+#### [Full Documentation](http://automergetool.readthedocs.io/en/stable/)
 
 ## Usage example
 

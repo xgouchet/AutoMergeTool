@@ -26,7 +26,7 @@ You can add the following options :
    solver's process in the console output.
 
 Woven Conflicts (``gen_woven``)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This tool will handle any conflict for which the local and remote modify
 different lines (eg: local modifies lines 1,2 and 5, remote modifies
